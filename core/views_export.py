@@ -11,17 +11,17 @@ def cliente_export_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="clientes.csv"'
     writer = csv.writer(response)
-    writer.writerow(['Nombre', 'CIF', 'Email', 'Teléfono', 'Localidad', 'Activo'])
+    writer.writerow(['Nombre', 'CIF', 'Email', 'Teléfono', 'Dirección', 'Activo'])
 
-    clientes = Cliente.objects.filter(usuario=request.user) if request.user.rol != 'admin' else Cliente.objects.all()
+    clientes = Cliente.objects.filter(usuario=request.user)
     for c in clientes:
-        writer.writerow([c.nombre, c.cif, c.email, c.telefono, c.localidad, 'Sí' if c.activo else 'No'])
+        writer.writerow([c.nombre, c.cif, c.email, c.telefono, c.direccion, 'Sí' if c.activo else 'No'])
 
     return response
 
 @login_required
 def cliente_export_pdf(request):
-    clientes = Cliente.objects.filter(usuario=request.user) if request.user.rol != 'admin' else Cliente.objects.all()
+    clientes = Cliente.objects.filter(usuario=request.user)
     template = get_template('core/clientes_pdf.html')
     html = template.render({'clientes': clientes})
     response = HttpResponse(content_type='application/pdf')

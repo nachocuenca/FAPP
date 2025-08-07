@@ -45,15 +45,32 @@ class ClienteCRUDTests(TestCase):
         self.assertRedirects(response, reverse("clientes:cliente_list"), fetch_redirect_response=False)
         self.assertEqual(Cliente.objects.count(), 0)
 
+    def test_list_filters_by_user(self):
+        User = get_user_model()
+        Cliente.objects.create(usuario=self.user, nombre="Mine")
+        other = User.objects.create_user(username="other", password="pass")
+        Cliente.objects.create(usuario=other, nombre="Other")
+        response = self.client.get(reverse("clientes:cliente_list"))
+        self.assertContains(response, "Mine")
+        self.assertNotContains(response, "Other")
+
     def test_export_csv(self):
+        User = get_user_model()
         Cliente.objects.create(usuario=self.user, nombre="CSV")
+        other = User.objects.create_user(username="other", password="pass")
+        Cliente.objects.create(usuario=other, nombre="OTHER")
         response = self.client.get(reverse("clientes:cliente_export_csv"))
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"CSV", response.content)
+        self.assertNotIn(b"OTHER", response.content)
 
     def test_export_pdf(self):
+        User = get_user_model()
         Cliente.objects.create(usuario=self.user, nombre="PDF")
+        other = User.objects.create_user(username="other", password="pass")
+        Cliente.objects.create(usuario=other, nombre="OTHER")
         response = self.client.get(reverse("clientes:cliente_export_pdf"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
         self.assertTrue(response.content.startswith(b"%PDF"))
+        self.assertNotIn(b"OTHER", response.content)
