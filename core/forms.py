@@ -1,5 +1,5 @@
 from django import forms
-from .models import Cliente, Presupuesto, Pedido, Actuacion, Factura
+from .models import Cliente, Pedido, Actuacion, Factura
 
 
 class ClienteForm(forms.ModelForm):
@@ -22,24 +22,6 @@ class ClienteForm(forms.ModelForm):
         }
 
 
-class PresupuestoForm(forms.ModelForm):
-    class Meta:
-        model = Presupuesto
-        fields = ['cliente', 'fecha', 'concepto', 'total']
-        labels = {
-            'cliente': 'Cliente',
-            'fecha': 'Fecha',
-            'concepto': 'Concepto',
-            'total': 'Importe total (€)',
-        }
-        widgets = {
-            'cliente': forms.Select(attrs={'class': 'form-select'}),
-            'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'concepto': forms.TextInput(attrs={'class': 'form-control'}),
-            'total': forms.NumberInput(attrs={'class': 'form-control'}),
-        }
-
-
 class PedidoForm(forms.ModelForm):
     class Meta:
         model = Pedido
@@ -49,7 +31,7 @@ class PedidoForm(forms.ModelForm):
             'presupuesto': 'Presupuesto',
             'fecha': 'Fecha',
             'descripcion': 'Descripción',
-            'total': 'Total (€)',
+            'total': 'Total',
         }
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-select'}),
@@ -69,7 +51,7 @@ class ActuacionForm(forms.ModelForm):
             'pedido': 'Pedido',
             'fecha': 'Fecha',
             'descripcion': 'Descripción del servicio',
-            'total': 'Total (€)',
+            'total': 'Total',
         }
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-select'}),

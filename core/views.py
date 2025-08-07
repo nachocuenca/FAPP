@@ -1,12 +1,13 @@
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from .models import Cliente, Presupuesto, Pedido, Actuacion, Factura
 from .forms import ClienteForm, PresupuestoForm, PedidoForm
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
-import csv
+from .utils import export_csv, export_pdf, render_html
+
 
 @login_required
 def dashboard(request):
@@ -43,50 +44,27 @@ def cliente_editar(request, pk):
 
 @login_required
 def cliente_export_csv(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="clientes.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['Nombre', 'Email', 'Teléfono'])
-    for cliente in Cliente.objects.all():
-        writer.writerow([cliente.nombre, cliente.email, cliente.telefono])
-    return response
+    queryset = Cliente.objects.all()
+    fields = [
+        ('nombre', 'Nombre'),
+        ('email', 'Email'),
+        ('telefono', 'Teléfono'),
+    ]
+    return export_csv(queryset, fields, 'clientes.csv')
 
-# --- Presupuestos ---
-@login_required
-def presupuestos_list(request):
-    presupuestos = Presupuesto.objects.all()
-    return render(request, 'core/presupuestos/presupuestos_list.html', {'presupuestos': presupuestos})
 
 @login_required
-def presupuesto_nuevo(request):
-    if request.method == 'POST':
-        form = PresupuestoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('presupuestos_list')
-    else:
-        form = PresupuestoForm()
-    return render(request, 'core/presupuestos/presupuesto_form.html', {'form': form})
+def cliente_export_pdf(request):
+    clientes = Cliente.objects.all()
+    context = {'clientes': clientes}
+    return export_pdf('core/clientes_pdf.html', context, 'clientes.pdf')
+
 
 @login_required
-def presupuesto_editar(request, pk):
-    presupuesto = get_object_or_404(Presupuesto, pk=pk)
-    if request.method == 'POST':
-        form = PresupuestoForm(request.POST, instance=presupuesto)
-        if form.is_valid():
-            form.save()
-            return redirect('presupuestos_list')
-    else:
-        form = PresupuestoForm(instance=presupuesto)
-    return render(request, 'core/presupuestos/presupuesto_form.html', {'form': form})
-
-@login_required
-def presupuesto_export_csv(request):
-    return HttpResponse("Exportar CSV (presupuestos)")
-
-@login_required
-def presupuesto_export_pdf(request):
-    return HttpResponse("Exportar PDF (presupuestos)")
+def cliente_print_html(request):
+    clientes = Cliente.objects.all()
+    context = {'clientes': clientes}
+    return render_html('core/clientes_pdf.html', context)
 
 # --- Pedidos ---
 @login_required

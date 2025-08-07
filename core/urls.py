@@ -1,6 +1,5 @@
-
 from django.urls import path
-from . import views  # Esta importación es obligatoria
+from . import views
 
 urlpatterns = [
     # Dashboard
@@ -11,13 +10,8 @@ urlpatterns = [
     path('clientes/nuevo/', views.cliente_nuevo, name='cliente_nuevo'),
     path('clientes/editar/<int:pk>/', views.cliente_editar, name='cliente_editar'),
     path('clientes/export/csv/', views.cliente_export_csv, name='cliente_export_csv'),
-
-    # Presupuestos
-    path('presupuestos/', views.presupuestos_list, name='presupuestos_list'),
-    path('presupuestos/nuevo/', views.presupuesto_nuevo, name='presupuesto_nuevo'),
-    path('presupuestos/editar/<int:pk>/', views.presupuesto_editar, name='presupuesto_editar'),
-    path('presupuestos/export/csv/', views.presupuesto_export_csv, name='presupuesto_export_csv'),
-    path('presupuestos/export/pdf/', views.presupuesto_export_pdf, name='presupuesto_export_pdf'),
+    path('clientes/export/pdf/', views.cliente_export_pdf, name='cliente_export_pdf'),
+    path('clientes/print/html/', views.cliente_print_html, name='cliente_print_html'),
 
     # Pedidos
     path('pedidos/', views.pedidos_list, name='pedidos_list'),

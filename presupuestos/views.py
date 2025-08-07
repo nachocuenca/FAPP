@@ -1,4 +1,3 @@
-
 import csv
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -9,26 +8,34 @@ from .models import Presupuesto
 from .forms import PresupuestoForm
 
 @login_required
-def presupuestos_list(request):
+def presupuesto_list(request):
     presupuestos = Presupuesto.objects.all()
-    return render(request, 'core/presupuestos/presupuestos_list.html', {'presupuestos': presupuestos})
+    return render(request, 'presupuestos/presupuesto_list.html', {'presupuestos': presupuestos})
 
 @login_required
-def presupuesto_nuevo(request):
+def presupuesto_create(request):
     form = PresupuestoForm(request.POST or None)
     if form.is_valid():
         form.save()
-        return redirect('presupuestos_list')
-    return render(request, 'core/presupuestos/presupuesto_form.html', {'form': form, 'modo': 'Nuevo'})
+        return redirect('presupuesto_list')
+    return render(request, 'presupuestos/presupuesto_form.html', {'form': form, 'modo': 'Nuevo'})
 
 @login_required
-def presupuesto_editar(request, pk):
+def presupuesto_update(request, pk):
     presupuesto = get_object_or_404(Presupuesto, pk=pk)
     form = PresupuestoForm(request.POST or None, instance=presupuesto)
     if form.is_valid():
         form.save()
-        return redirect('presupuestos_list')
-    return render(request, 'core/presupuestos/presupuesto_form.html', {'form': form, 'modo': 'Editar'})
+        return redirect('presupuesto_list')
+    return render(request, 'presupuestos/presupuesto_form.html', {'form': form, 'modo': 'Editar'})
+
+@login_required
+def presupuesto_delete(request, pk):
+    presupuesto = get_object_or_404(Presupuesto, pk=pk)
+    if request.method == 'POST':
+        presupuesto.delete()
+        return redirect('presupuesto_list')
+    return render(request, 'presupuestos/presupuesto_confirm_delete.html', {'presupuesto': presupuesto})
 
 @login_required
 def presupuesto_export_csv(request):
@@ -43,9 +50,18 @@ def presupuesto_export_csv(request):
 @login_required
 def presupuesto_export_pdf(request):
     presupuestos = Presupuesto.objects.all()
-    template = get_template('core/presupuestos/presupuestos_pdf.html')
+    template = get_template('presupuestos/presupuestos_pdf.html')
     html = template.render({'presupuestos': presupuestos})
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="presupuestos.pdf"'
     pisa.CreatePDF(html, dest=response)
+    return response
+
+@login_required
+def presupuesto_export_html(request):
+    presupuestos = Presupuesto.objects.all()
+    template = get_template('presupuestos/presupuesto_list.html')
+    html = template.render({'presupuestos': presupuestos})
+    response = HttpResponse(html, content_type='text/html')
+    response['Content-Disposition'] = 'attachment; filename="presupuestos.html"'
     return response
