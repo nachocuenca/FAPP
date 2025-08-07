@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.template.loader import get_template
 from xhtml2pdf import pisa
-from core.models import Presupuesto
+from .models import Presupuesto
 from .forms import PresupuestoForm
 
 @login_required
