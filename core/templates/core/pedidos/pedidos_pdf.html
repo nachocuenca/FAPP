@@ -10,27 +10,23 @@
   </style>
 </head>
 <body>
-  <h2>Listado de clientes</h2>
+  <h2>Listado de pedidos</h2>
   <table>
     <thead>
       <tr>
-        <th>Nombre</th>
-        <th>CIF</th>
-        <th>Email</th>
-        <th>Teléfono</th>
-        <th>Dirección</th>
-        <th>Activo</th>
+        <th>Fecha</th>
+        <th>Cliente</th>
+        <th>Presupuesto</th>
+        <th>Total</th>
       </tr>
     </thead>
     <tbody>
-      {% for c in clientes %}
+      {% for p in pedidos %}
       <tr>
-        <td>{{ c.nombre }}</td>
-        <td>{{ c.cif }}</td>
-        <td>{{ c.email }}</td>
-        <td>{{ c.telefono }}</td>
-        <td>{{ c.direccion }}</td>
-        <td>{{ c.activo|yesno:"Sí,No" }}</td>
+        <td>{{ p.fecha }}</td>
+        <td>{{ p.cliente.nombre }}</td>
+        <td>{% if p.presupuesto %}{{ p.presupuesto.id }}{% endif %}</td>
+        <td>{{ p.total }}</td>
       </tr>
       {% endfor %}
     </tbody>

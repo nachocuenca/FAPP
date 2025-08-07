@@ -1,0 +1,62 @@
+[
+  {
+    "model": "core.usuario",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$ycyIlETDwSZHsPdtsIa0Ca$NH33JFNbCDcHzNJXPAH5gdBSYQXZ618xE+hbbzhdlpw=",
+      "last_login": null,
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "",
+      "last_name": "",
+      "email": "admin@example.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "rol": "admin",
+      "cif": "",
+      "direccion": "",
+      "cp": "",
+      "localidad": "",
+      "provincia": "",
+      "telefono": "",
+      "web": "",
+      "logo": "",
+      "serie_facturas": "A",
+      "inicio_serie_facturas": 1,
+      "pie_factura": "",
+      "notas_factura": "",
+      "color_primario": "#000000",
+      "fuente_factura": ""
+    }
+  },
+  {
+    "model": "core.cliente",
+    "pk": 1,
+    "fields": {
+      "usuario": 1,
+      "nombre": "Cliente Demo",
+      "cif": "12345678A",
+      "direccion": "Calle Falsa 123",
+      "cp": "28080",
+      "localidad": "Madrid",
+      "provincia": "Madrid",
+      "email": "cliente@example.com",
+      "telefono": "600000000",
+      "activo": true
+    }
+  },
+  {
+    "model": "presupuestos.presupuesto",
+    "pk": 1,
+    "fields": {
+      "usuario": 1,
+      "cliente": 1,
+      "numero": "P-0001",
+      "fecha": "2024-01-10",
+      "concepto": "Servicio de prueba",
+      "total": "1000.00",
+      "estado": "pendiente"
+    }
+  }
+]
