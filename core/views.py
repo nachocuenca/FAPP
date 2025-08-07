@@ -2,16 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from .models import Cliente, Pedido, Actuacion, Factura
-from django.http import HttpResponse
-from django.template.loader import render_to_string
+from django.template.loader import get_template, render_to_string
 import csv
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from .forms import ClienteForm, PedidoForm, ActuacionForm, FacturaForm
-from django.template.loader import get_template
 from xhtml2pdf import pisa
 from .utils import export_csv, export_pdf, render_html
-
 
 
 @login_required
@@ -26,28 +23,37 @@ def clientes_list(request):
 
 @login_required
 def cliente_nuevo(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ClienteForm(request.POST)
         if form.is_valid():
             cliente = form.save(commit=False)
             cliente.usuario = request.user
             cliente.save()
-            return redirect('clientes_list')
+            return redirect("clientes_list")
     else:
         form = ClienteForm()
-    return render(request, 'core/clientes/cliente_form.html', {'form': form})
+    return render(
+        request,
+        "core/cliente_form.html",
+        {"form": form, "modo": "nuevo"},
+    )
 
 @login_required
 def cliente_editar(request, pk):
+
     cliente = get_object_or_404(Cliente, pk=pk, usuario=request.user)
     if request.method == 'POST':
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
             form.save()
-            return redirect('clientes_list')
+            return redirect("clientes_list")
     else:
         form = ClienteForm(instance=cliente)
-    return render(request, 'core/clientes/cliente_form.html', {'form': form})
+    return render(
+        request,
+        "core/cliente_form.html",
+        {"form": form, "modo": "editar"},
+    )
 
 @login_required
 def cliente_export_csv(request):
