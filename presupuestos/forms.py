@@ -17,3 +17,9 @@ class PresupuestoForm(forms.ModelForm):
             'concepto': forms.Textarea(attrs={'rows': 3}),
             'fecha': forms.DateInput(attrs={'type': 'date'}),
         }
+
+    def clean_total(self):
+        total = self.cleaned_data.get('total')
+        if total is not None and total < 0:
+            raise forms.ValidationError('El total debe ser mayor o igual a cero.')
+        return total

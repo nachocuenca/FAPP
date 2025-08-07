@@ -56,6 +56,12 @@ class PedidoForm(forms.ModelForm):
             'total': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
+    def clean_total(self):
+        total = self.cleaned_data.get('total')
+        if total is not None and total < 0:
+            raise forms.ValidationError('El total debe ser mayor o igual a cero.')
+        return total
+
 
 class ActuacionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -86,6 +92,12 @@ class ActuacionForm(forms.ModelForm):
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'coste': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+
+    def clean_coste(self):
+        coste = self.cleaned_data.get('coste')
+        if coste is not None and coste < 0:
+            raise forms.ValidationError('El coste debe ser mayor o igual a cero.')
+        return coste
 
 class FacturaForm(forms.ModelForm):
     total = forms.DecimalField(
@@ -132,3 +144,21 @@ class FacturaForm(forms.ModelForm):
             'irpf': forms.NumberInput(attrs={'class': 'form-control'}),
             'estado': forms.Select(attrs={'class': 'form-select'}),
         }
+
+    def clean_base_imponible(self):
+        base_imponible = self.cleaned_data.get('base_imponible')
+        if base_imponible is not None and base_imponible < 0:
+            raise forms.ValidationError('La base imponible debe ser mayor o igual a cero.')
+        return base_imponible
+
+    def clean_iva(self):
+        iva = self.cleaned_data.get('iva')
+        if iva is not None and iva < 0:
+            raise forms.ValidationError('El IVA debe ser mayor o igual a cero.')
+        return iva
+
+    def clean_irpf(self):
+        irpf = self.cleaned_data.get('irpf')
+        if irpf is not None and irpf < 0:
+            raise forms.ValidationError('El IRPF debe ser mayor o igual a cero.')
+        return irpf
