@@ -18,7 +18,11 @@ class Usuario(AbstractUser):
 # --------------------------
 
 class Cliente(models.Model):
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="clientes",
+    )
     nombre = models.CharField(max_length=100)
     cif = models.CharField(max_length=20, blank=True, null=True, unique=True)
     direccion = models.CharField(max_length=200, blank=True, null=True)
@@ -32,7 +36,11 @@ class Cliente(models.Model):
 
 
 class Presupuesto(models.Model):
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="presupuestos",
+    )
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     fecha = models.DateField()
     concepto = models.CharField(max_length=255)
@@ -48,7 +56,11 @@ class Presupuesto(models.Model):
 # --------------------------
 
 class Pedido(models.Model):
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="pedidos",
+    )
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     presupuesto = models.ForeignKey(
         Presupuesto, on_delete=models.SET_NULL, null=True, blank=True
@@ -64,7 +76,11 @@ class Pedido(models.Model):
 
 class Actuacion(models.Model):
 
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="actuaciones",
+    )
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='actuaciones')
     fecha = models.DateField()
@@ -76,7 +92,11 @@ class Actuacion(models.Model):
 
 
 class Factura(models.Model):
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="facturas",
+    )
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     pedido = models.ForeignKey(Pedido, on_delete=models.SET_NULL, null=True, blank=True)
     actuacion = models.ForeignKey(
