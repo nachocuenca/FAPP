@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import os
 
@@ -17,6 +16,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'clientes',
     'adminlte3',
     'adminlte3_theme',
     'django_bootstrap5',
@@ -62,6 +62,8 @@ WSGI_APPLICATION = 'fapp.wsgi.application'
 
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('POSTGRES_DB', 'fappdb'),
         'USER': os.getenv('POSTGRES_USER', 'fappuser'),
