@@ -1,8 +1,7 @@
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Cliente, Presupuesto, Pedido, Actuacion, Factura
-from .forms import ClienteForm, PresupuestoForm
+from .models import Cliente, Pedido, Actuacion, Factura
+from .forms import ClienteForm, PedidoForm, ActuacionForm, FacturaForm
 from django.http import HttpResponse
 import csv
 
@@ -48,43 +47,6 @@ def cliente_export_csv(request):
     for cliente in Cliente.objects.all():
         writer.writerow([cliente.nombre, cliente.email, cliente.telefono])
     return response
-
-# --- Presupuestos ---
-@login_required
-def presupuestos_list(request):
-    presupuestos = Presupuesto.objects.all()
-    return render(request, 'core/presupuestos/presupuestos_list.html', {'presupuestos': presupuestos})
-
-@login_required
-def presupuesto_nuevo(request):
-    if request.method == 'POST':
-        form = PresupuestoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('presupuestos_list')
-    else:
-        form = PresupuestoForm()
-    return render(request, 'core/presupuestos/presupuesto_form.html', {'form': form})
-
-@login_required
-def presupuesto_editar(request, pk):
-    presupuesto = get_object_or_404(Presupuesto, pk=pk)
-    if request.method == 'POST':
-        form = PresupuestoForm(request.POST, instance=presupuesto)
-        if form.is_valid():
-            form.save()
-            return redirect('presupuestos_list')
-    else:
-        form = PresupuestoForm(instance=presupuesto)
-    return render(request, 'core/presupuestos/presupuesto_form.html', {'form': form})
-
-@login_required
-def presupuesto_export_csv(request):
-    return HttpResponse("Exportar CSV (presupuestos)")
-
-@login_required
-def presupuesto_export_pdf(request):
-    return HttpResponse("Exportar PDF (presupuestos)")
 
 # --- Pedidos ---
 @login_required
