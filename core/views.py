@@ -63,14 +63,20 @@ def cliente_export_csv(request):
         ('email', 'Email'),
         ('telefono', 'Teléfono'),
     ]
-    return export_csv(queryset, fields, 'clientes.csv')
+    try:
+        return export_csv(queryset, fields, 'clientes.csv')
+    except Exception as e:
+        return HttpResponse(f"Error al generar CSV: {e}", status=500)
 
 
 @login_required
 def cliente_export_pdf(request):
     clientes = Cliente.objects.filter(usuario=request.user)
     context = {'clientes': clientes}
-    return export_pdf('core/clientes_pdf.html', context, 'clientes.pdf')
+    try:
+        return export_pdf('core/clientes_pdf.html', context, 'clientes.pdf')
+    except Exception as e:
+        return HttpResponse(f"Error al generar PDF: {e}", status=500)
 
 
 @login_required
@@ -111,6 +117,7 @@ def pedido_editar(request, pk):
 
 @login_required
 def pedido_export_csv(request):
+
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="pedidos.csv"'
     writer = csv.writer(response)
@@ -226,6 +233,7 @@ def factura_export_csv(request):
     return response
 
 
+
 @login_required
 def factura_export_html(request):
     facturas = Factura.objects.filter(usuario=request.user)
@@ -235,6 +243,7 @@ def factura_export_html(request):
     response = HttpResponse(html, content_type="text/html")
     response["Content-Disposition"] = 'attachment; filename="facturas.html"'
     return response
+
 
 
 @login_required
@@ -257,3 +266,4 @@ def factura_export_pdf(request):
     p.showPage()
     p.save()
     return response
+

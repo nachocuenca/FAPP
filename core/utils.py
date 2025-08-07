@@ -15,7 +15,7 @@ def export_csv(queryset, fields, filename="export.csv"):
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = f"attachment; filename=\"{filename}\""
     writer = csv.writer(response)
-    headers = [label if isinstance(field, (tuple, list)) else field for field in fields]
+    headers = [field[1] if isinstance(field, (tuple, list)) else field for field in fields]
     writer.writerow(headers)
     for obj in queryset:
         row = []

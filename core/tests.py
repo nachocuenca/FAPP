@@ -1,6 +1,7 @@
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from unittest.mock import patch
 from .models import Cliente, Pedido, Factura, Actuacion
 
 
@@ -45,6 +46,13 @@ class FacturaTests(TestCase):
         response = self.client.get(reverse("factura_export_csv"))
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"F001", response.content)
+
+    @patch("core.views.export_csv", side_effect=Exception("boom"))
+    def test_export_csv_error(self, mock_export):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("factura_export_csv"))
+        self.assertEqual(response.status_code, 500)
+        self.assertIn(b"Error al generar CSV", response.content)
 
 
 class PedidoCRUDTests(TestCase):
@@ -115,6 +123,18 @@ class PedidoCRUDTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
         self.assertTrue(response.content.startswith(b"%PDF"))
+
+    @patch("core.views.export_csv", side_effect=Exception("boom"))
+    def test_export_csv_error(self, mock_export):
+        response = self.client.get(reverse("pedido_export_csv"))
+        self.assertEqual(response.status_code, 500)
+        self.assertIn(b"Error al generar CSV", response.content)
+
+    @patch("core.views.export_pdf", side_effect=Exception("boom"))
+    def test_export_pdf_error(self, mock_export):
+        response = self.client.get(reverse("pedido_export_pdf"))
+        self.assertEqual(response.status_code, 500)
+        self.assertIn(b"Error al generar PDF", response.content)
 
 
 class ActuacionCRUDTests(TestCase):
