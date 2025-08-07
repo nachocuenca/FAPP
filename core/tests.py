@@ -360,3 +360,73 @@ class AccessControlTests(TestCase):
             fetch_redirect_response=False,
         )
 
+    def test_pedido_cross_access_forbidden(self):
+        self.client.force_login(self.user1)
+        with patch(
+            "core.forms.Cliente.objects.filter",
+            return_value=Cliente.objects.all(),
+        ):
+            response = self.client.post(
+                reverse("pedido_nuevo"),
+                {
+                    "cliente": self.cliente2.pk,
+                    "presupuesto": "",
+                    "fecha": "2024-01-01",
+                    "descripcion": "Cross",
+                    "total": 100,
+                },
+            )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Pedido.objects.filter(usuario=self.user1).count(), 1)
+
+    def test_actuacion_cross_access_forbidden(self):
+        self.client.force_login(self.user1)
+        with patch(
+            "core.forms.Cliente.objects.filter",
+            return_value=Cliente.objects.all(),
+        ), patch(
+            "core.forms.Pedido.objects.filter",
+            return_value=Pedido.objects.all(),
+        ):
+            response = self.client.post(
+                reverse("actuacion_nueva"),
+                {
+                    "cliente": self.cliente2.pk,
+                    "pedido": self.pedido2.pk,
+                    "fecha": "2024-01-02",
+                    "descripcion": "Cross",
+                    "coste": 50,
+                },
+            )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Actuacion.objects.filter(usuario=self.user1).count(), 1)
+
+    def test_factura_cross_access_forbidden(self):
+        self.client.force_login(self.user1)
+        with patch(
+            "core.forms.Cliente.objects.filter",
+            return_value=Cliente.objects.all(),
+        ), patch(
+            "core.forms.Pedido.objects.filter",
+            return_value=Pedido.objects.all(),
+        ), patch(
+            "core.forms.Actuacion.objects.filter",
+            return_value=Actuacion.objects.all(),
+        ):
+            response = self.client.post(
+                reverse("factura_nueva"),
+                {
+                    "cliente": self.cliente2.pk,
+                    "pedido": self.pedido2.pk,
+                    "actuacion": self.actuacion2.pk,
+                    "fecha": "2024-01-03",
+                    "numero": "FX",
+                    "base_imponible": 100,
+                    "iva": 21,
+                    "irpf": 0,
+                    "estado": "borrador",
+                },
+            )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Factura.objects.filter(usuario=self.user1).count(), 1)
+
