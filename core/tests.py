@@ -229,7 +229,6 @@ class ActuacionCRUDTests(TestCase):
                     (
                         "django.template.loaders.locmem.Loader",
                         {
-                            "core/clientes/clientes_list.html": "{% for c in clientes %}{{ c.nombre }}{% endfor %}",
                             "core/pedidos/pedidos_list.html": "{% for p in pedidos %}{{ p.descripcion }}{% endfor %}",
                             "core/actuaciones/actuaciones_list.html": "{% for a in actuaciones %}{{ a.descripcion }}{% endfor %}",
                             "core/facturas/facturas_list.html": "{% for f in facturas %}{{ f.numero }}{% endfor %}",
@@ -304,19 +303,6 @@ class AccessControlTests(TestCase):
             irpf=0,
         )
 
-    def test_clientes_list_filters_user(self):
-        self.client.force_login(self.user1)
-        response = self.client.get(reverse("clientes_list"))
-        self.assertContains(response, "Cliente1")
-        self.assertNotContains(response, "Cliente2")
-
-    def test_clientes_list_requires_login(self):
-        response = self.client.get(reverse("clientes_list"))
-        self.assertRedirects(
-            response,
-            f"/accounts/login/?next={reverse('clientes_list')}",
-            fetch_redirect_response=False,
-        )
 
     def test_pedidos_list_filters_user(self):
         self.client.force_login(self.user1)

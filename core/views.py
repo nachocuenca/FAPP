@@ -1,90 +1,20 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden
-from .models import Cliente, Pedido, Actuacion, Factura
-from django.template.loader import get_template, render_to_string
+from .models import Pedido, Actuacion, Factura
+from django.template.loader import render_to_string
 import csv
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from core.forms import ClienteForm, PedidoForm, ActuacionForm, FacturaForm
-from xhtml2pdf import pisa
-from .utils import export_csv, export_pdf, render_html
+from core.forms import PedidoForm, ActuacionForm, FacturaForm
+from .utils import export_csv, export_pdf
 
 
 @login_required
 def dashboard(request):
     return render(request, 'core/dashboard.html')
 
-# --- Clientes ---
-@login_required
-def clientes_list(request):
-    clientes = Cliente.objects.filter(usuario=request.user)
-    return render(request, 'core/clientes/clientes_list.html', {'clientes': clientes})
-
-@login_required
-def cliente_nuevo(request):
-    if request.method == "POST":
-        form = ClienteForm(request.POST, request=request)
-        if form.is_valid():
-            cliente = form.save(commit=False)
-            cliente.usuario = request.user
-            cliente.save()
-            return redirect("clientes_list")
-    else:
-        form = ClienteForm(request=request)
-    return render(
-        request,
-        "core/clientes/cliente_form.html",
-        {"form": form, "modo": "nuevo"},
-    )
-
-@login_required
-def cliente_editar(request, pk):
-
-    cliente = get_object_or_404(Cliente, pk=pk, usuario=request.user)
-    if request.method == 'POST':
-        form = ClienteForm(request.POST, instance=cliente, request=request)
-        if form.is_valid():
-            form.save()
-            return redirect("clientes_list")
-    else:
-        form = ClienteForm(instance=cliente, request=request)
-    return render(
-        request,
-        "core/clientes/cliente_form.html",
-        {"form": form, "modo": "editar"},
-    )
-
-@login_required
-def cliente_export_csv(request):
-    queryset = Cliente.objects.filter(usuario=request.user)
-    fields = [
-        ('nombre', 'Nombre'),
-        ('email', 'Email'),
-        ('telefono', 'Teléfono'),
-    ]
-    try:
-        return export_csv(queryset, fields, 'clientes.csv')
-    except Exception as e:
-        return HttpResponse(f"Error al generar CSV: {e}", status=500)
-
-
-@login_required
-def cliente_export_pdf(request):
-    clientes = Cliente.objects.filter(usuario=request.user)
-    context = {'clientes': clientes}
-    try:
-        return export_pdf('core/clientes/clientes_pdf.html', context, 'clientes.pdf')
-    except Exception as e:
-        return HttpResponse(f"Error al generar PDF: {e}", status=500)
-
-
-@login_required
-def cliente_print_html(request):
-    clientes = Cliente.objects.filter(usuario=request.user)
-    context = {'clientes': clientes}
-    return render_html('core/clientes/clientes_pdf.html', context)
-
+# --- Pedidos ---
 @login_required
 def pedidos_list(request):
     pedidos = Pedido.objects.filter(usuario=request.user)
