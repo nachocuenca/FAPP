@@ -3,7 +3,7 @@
 {% block content %}
 <div class="card">
   <div class="card-body">
-    <p>¿Seguro que deseas eliminar a {{ cliente.nombre }}?</p>
+    <p>¿Seguro que deseas eliminar a {{ object.nombre }}?</p>
     <form method="post">
       {% csrf_token %}
       <button type="submit" class="btn btn-danger">Eliminar</button>

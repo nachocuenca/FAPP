@@ -1,55 +1,57 @@
 from io import BytesIO
 import csv
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from reportlab.pdfgen import canvas
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
 from core.forms import ClienteForm
 from core.models import Cliente
 
-@login_required
-def cliente_list(request):
-    clientes = Cliente.objects.filter(usuario=request.user)
-    return render(request, 'core/clientes/cliente_list.html', {'clientes': clientes})
+
+class ClienteListView(LoginRequiredMixin, ListView):
+    model = Cliente
+    template_name = 'core/clientes/cliente_list.html'
+
+    def get_queryset(self):
+        return Cliente.objects.filter(usuario=self.request.user)
 
 
-@login_required
-def cliente_create(request):
-    if request.method == 'POST':
-        form = ClienteForm(request.POST)
-        if form.is_valid():
-            cliente = form.save(commit=False)
-            cliente.usuario = request.user
-            cliente.save()
-            return redirect('clientes:cliente_list')
-    else:
-        form = ClienteForm()
-    return render(request, 'core/clientes/cliente_form.html', {'form': form})
+class ClienteCreateView(LoginRequiredMixin, CreateView):
+    model = Cliente
+    form_class = ClienteForm
+    template_name = 'core/clientes/cliente_form.html'
+    success_url = reverse_lazy('clientes:cliente_list')
+
+    def form_valid(self, form):
+        form.instance.usuario = self.request.user
+        return super().form_valid(form)
 
 
-@login_required
-def cliente_edit(request, pk):
-    cliente = get_object_or_404(Cliente, pk=pk, usuario=request.user)
-    if request.method == 'POST':
-        form = ClienteForm(request.POST, instance=cliente)
-        if form.is_valid():
-            cliente = form.save(commit=False)
-            cliente.usuario = request.user
-            cliente.save()
-            return redirect('clientes:cliente_list')
-    else:
-        form = ClienteForm(instance=cliente)
-    return render(request, 'core/clientes/cliente_form.html', {'form': form})
+class ClienteUpdateView(LoginRequiredMixin, UpdateView):
+    model = Cliente
+    form_class = ClienteForm
+    template_name = 'core/clientes/cliente_form.html'
+    success_url = reverse_lazy('clientes:cliente_list')
+
+    def get_queryset(self):
+        return Cliente.objects.filter(usuario=self.request.user)
+
+    def form_valid(self, form):
+        form.instance.usuario = self.request.user
+        return super().form_valid(form)
 
 
-@login_required
-def cliente_delete(request, pk):
-    cliente = get_object_or_404(Cliente, pk=pk, usuario=request.user)
-    if request.method == 'POST':
-        cliente.delete()
-        return redirect('clientes:cliente_list')
-    return render(request, 'core/clientes/cliente_confirm_delete.html', {'cliente': cliente})
+class ClienteDeleteView(LoginRequiredMixin, DeleteView):
+    model = Cliente
+    template_name = 'core/clientes/cliente_confirm_delete.html'
+    success_url = reverse_lazy('clientes:cliente_list')
+
+    def get_queryset(self):
+        return Cliente.objects.filter(usuario=self.request.user)
 
 
 @login_required
