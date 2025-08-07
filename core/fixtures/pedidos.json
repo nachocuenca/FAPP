@@ -1,0 +1,38 @@
+[
+  {
+    "model": "core.cliente",
+    "pk": 1,
+    "fields": {
+      "usuario": 1,
+      "nombre": "Acme Corp",
+      "cif": "A12345678",
+      "direccion": "Calle Falsa 123",
+      "email": "cliente@acme.com",
+      "telefono": "555123456",
+      "activo": true
+    }
+  },
+  {
+    "model": "core.presupuesto",
+    "pk": 1,
+    "fields": {
+      "usuario": 1,
+      "cliente": 1,
+      "fecha": "2024-01-15",
+      "concepto": "Proyecto inicial",
+      "total": "1500.00"
+    }
+  },
+  {
+    "model": "core.pedido",
+    "pk": 1,
+    "fields": {
+      "usuario": 1,
+      "cliente": 1,
+      "presupuesto": 1,
+      "fecha": "2024-02-01",
+      "descripcion": "Pedido de ejemplo",
+      "total": "1500.00"
+    }
+  }
+]

@@ -2,8 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from .models import Cliente, Presupuesto, Pedido, Actuacion, Factura
-from .forms import ClienteForm, PresupuestoForm
+from .forms import ClienteForm, PresupuestoForm, PedidoForm
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 from .utils import export_csv, export_pdf, render_html
+
 
 @login_required
 def dashboard(request):
@@ -65,15 +69,53 @@ def cliente_print_html(request):
 # --- Pedidos ---
 @login_required
 def pedidos_list(request):
-    return render(request, 'core/pedidos/pedidos_list.html')
+    pedidos = Pedido.objects.all()
+    return render(request, 'core/pedidos/pedidos_list.html', {'pedidos': pedidos})
 
 @login_required
 def pedido_nuevo(request):
-    return render(request, 'core/pedidos/pedido_form.html')
+    if request.method == 'POST':
+        form = PedidoForm(request.POST)
+        if form.is_valid():
+            pedido = form.save(commit=False)
+            pedido.usuario = request.user
+            pedido.save()
+            return redirect('pedidos_list')
+    else:
+        form = PedidoForm()
+    return render(request, 'core/pedidos/pedido_form.html', {'form': form, 'modo': 'nuevo'})
 
 @login_required
 def pedido_editar(request, pk):
-    return render(request, 'core/pedidos/pedido_form.html')
+    pedido = get_object_or_404(Pedido, pk=pk)
+    if request.method == 'POST':
+        form = PedidoForm(request.POST, instance=pedido)
+        if form.is_valid():
+            form.save()
+            return redirect('pedidos_list')
+    else:
+        form = PedidoForm(instance=pedido)
+    return render(request, 'core/pedidos/pedido_form.html', {'form': form, 'modo': 'editar'})
+
+@login_required
+def pedido_export_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="pedidos.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['Fecha', 'Cliente', 'Presupuesto', 'Total'])
+    for p in Pedido.objects.all():
+        writer.writerow([p.fecha, p.cliente.nombre, p.presupuesto.id if p.presupuesto else '', p.total])
+    return response
+
+@login_required
+def pedido_export_pdf(request):
+    pedidos = Pedido.objects.all()
+    template = get_template('core/pedidos/pedidos_pdf.html')
+    html = template.render({'pedidos': pedidos})
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="pedidos.pdf"'
+    pisa.CreatePDF(html, dest=response)
+    return response
 
 # --- Actuaciones ---
 @login_required
