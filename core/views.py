@@ -2,16 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from .models import Cliente, Pedido, Actuacion, Factura
-from django.http import HttpResponse
-from django.template.loader import render_to_string
+from django.template.loader import get_template, render_to_string
 import csv
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from .forms import ClienteForm, PedidoForm, ActuacionForm, FacturaForm
-from django.template.loader import get_template
 from xhtml2pdf import pisa
 from .utils import export_csv, export_pdf, render_html
-
 
 
 @login_required
