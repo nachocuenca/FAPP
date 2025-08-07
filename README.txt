@@ -14,8 +14,22 @@ Configuración del entorno
 3. Instala las dependencias del proyecto:
 
    ```bash
-   pip install django psycopg2-binary
+   pip install -r requirements.txt
    ```
+
+
+Dependencias
+------------
+
+El archivo `requirements.txt` incluye:
+
+- Django: framework de desarrollo web.
+- psycopg2-binary: adaptador de PostgreSQL para Python.
+- xhtml2pdf: conversión de HTML a PDF.
+- reportlab: generación de documentos PDF.
+- django-adminlte3: integración del tema AdminLTE.
+- django-bootstrap5: componentes de Bootstrap 5 para Django.
+- Pillow: procesamiento de imágenes.
 
 Base de datos
 -------------
@@ -27,6 +41,16 @@ Base de datos
    CREATE DATABASE fappdb;
    CREATE USER fappuser WITH PASSWORD 'fapppass';
    GRANT ALL PRIVILEGES ON DATABASE fappdb TO fappuser;
+   ```
+
+3. Configura las variables de entorno para la conexión:
+
+   ```bash
+   export POSTGRES_DB=fappdb
+   export POSTGRES_USER=fappuser
+   export POSTGRES_PASSWORD=fapppass
+   export POSTGRES_HOST=localhost
+   export POSTGRES_PORT=5432
    ```
 
 Migraciones y servidor
