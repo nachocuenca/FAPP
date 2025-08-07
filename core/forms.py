@@ -25,15 +25,17 @@ class ClienteForm(forms.ModelForm):
 class PedidoForm(forms.ModelForm):
     class Meta:
         model = Pedido
-        fields = ['cliente', 'fecha', 'descripcion', 'total']
+        fields = ['cliente', 'presupuesto', 'fecha', 'descripcion', 'total']
         labels = {
             'cliente': 'Cliente',
+            'presupuesto': 'Presupuesto',
             'fecha': 'Fecha',
             'descripcion': 'Descripción',
-            'total': 'Total (€)',
+            'total': 'Total',
         }
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-select'}),
+            'presupuesto': forms.Select(attrs={'class': 'form-select'}),
             'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'total': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -43,15 +45,17 @@ class PedidoForm(forms.ModelForm):
 class ActuacionForm(forms.ModelForm):
     class Meta:
         model = Actuacion
-        fields = ['cliente', 'fecha', 'descripcion', 'total']
+        fields = ['cliente', 'pedido', 'fecha', 'descripcion', 'total']
         labels = {
             'cliente': 'Cliente',
+            'pedido': 'Pedido',
             'fecha': 'Fecha',
             'descripcion': 'Descripción del servicio',
-            'total': 'Total (€)',
+            'total': 'Total',
         }
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-select'}),
+            'pedido': forms.Select(attrs={'class': 'form-select'}),
             'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'total': forms.NumberInput(attrs={'class': 'form-control'}),

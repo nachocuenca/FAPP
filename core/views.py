@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Cliente, Pedido, Actuacion, Factura
-from .forms import ClienteForm, PedidoForm, ActuacionForm, FacturaForm
 from django.http import HttpResponse
-import csv
+from .models import Cliente, Presupuesto, Pedido, Actuacion, Factura
+from .forms import ClienteForm, PresupuestoForm
+from .utils import export_csv, export_pdf, render_html
 
 @login_required
 def dashboard(request):
@@ -40,13 +40,27 @@ def cliente_editar(request, pk):
 
 @login_required
 def cliente_export_csv(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="clientes.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['Nombre', 'Email', 'Teléfono'])
-    for cliente in Cliente.objects.all():
-        writer.writerow([cliente.nombre, cliente.email, cliente.telefono])
-    return response
+    queryset = Cliente.objects.all()
+    fields = [
+        ('nombre', 'Nombre'),
+        ('email', 'Email'),
+        ('telefono', 'Teléfono'),
+    ]
+    return export_csv(queryset, fields, 'clientes.csv')
+
+
+@login_required
+def cliente_export_pdf(request):
+    clientes = Cliente.objects.all()
+    context = {'clientes': clientes}
+    return export_pdf('core/clientes_pdf.html', context, 'clientes.pdf')
+
+
+@login_required
+def cliente_print_html(request):
+    clientes = Cliente.objects.all()
+    context = {'clientes': clientes}
+    return render_html('core/clientes_pdf.html', context)
 
 # --- Pedidos ---
 @login_required

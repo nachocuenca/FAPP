@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class PresupuestosConfig(AppConfig):
+class ActuacionesConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'presupuestos'
+    name = 'actuaciones'
