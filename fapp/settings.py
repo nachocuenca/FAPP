@@ -1,7 +1,19 @@
 from pathlib import Path
 import os
+import importlib
+
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+def get_env(name, default=None, required=False):
+    """Obtiene una variable de entorno o lanza un error descriptivo."""
+    value = os.environ.get(name, default)
+    if required and value is None:
+        raise ImproperlyConfigured(
+            f"Falta la variable de entorno {name} para la configuración.")
+    return value
 
 # En producción este valor debe definirse mediante la variable de entorno
 # SECRET_KEY. El valor por defecto sólo debe usarse durante el desarrollo.
@@ -70,14 +82,22 @@ if os.environ.get("USE_SQLITE") == "1":
         }
     }
 else:
+    try:
+        importlib.import_module("psycopg2")
+    except Exception as exc:
+        raise ImproperlyConfigured(
+            "La librería 'psycopg2-binary' es necesaria para PostgreSQL. "
+            "Instálala con 'pip install psycopg2-binary'."
+        ) from exc
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('POSTGRES_DB', 'fappdb'),
-            'USER': os.getenv('POSTGRES_USER', 'fappuser'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'fapppass'),
-            'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
-            'PORT': os.getenv('POSTGRES_PORT', '5432'),
+            'NAME': get_env('POSTGRES_DB', required=True),
+            'USER': get_env('POSTGRES_USER', required=True),
+            'PASSWORD': get_env('POSTGRES_PASSWORD', required=True),
+            'HOST': get_env('POSTGRES_HOST', required=True),
+            'PORT': get_env('POSTGRES_PORT', required=True),
         }
     }
 
