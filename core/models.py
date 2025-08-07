@@ -83,7 +83,7 @@ class Factura(models.Model):
         Actuacion, on_delete=models.SET_NULL, null=True, blank=True
     )
     fecha = models.DateField()
-    numero = models.CharField(max_length=20)
+    numero = models.CharField(max_length=20, unique=True)
     base_imponible = models.DecimalField(max_digits=10, decimal_places=2)
     iva = models.DecimalField(max_digits=5, decimal_places=2, default=21.00)
     irpf = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
