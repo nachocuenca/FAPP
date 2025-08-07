@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from reportlab.pdfgen import canvas
 from django.contrib.auth.decorators import login_required
 
-from .forms import ClienteForm
+from core.forms import ClienteForm
 from core.models import Cliente
 
 @login_required
