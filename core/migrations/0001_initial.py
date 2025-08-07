@@ -112,29 +112,7 @@ class Migration(migrations.Migration):
                 ('cliente', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.cliente')),
                 ('usuario', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
-        ),
-        migrations.AddField(
-            model_name='actuacion',
-            name='pedidos',
-            field=models.ManyToManyField(to='core.pedido'),
-        ),
-        migrations.CreateModel(
-            name='Presupuesto',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('fecha', models.DateField()),
-                ('numero', models.CharField(max_length=50)),
-                ('estado', models.CharField(choices=[('pendiente', 'Pendiente'), ('aceptado', 'Aceptado'), ('rechazado', 'Rechazado')], default='pendiente', max_length=20)),
-                ('observaciones', models.TextField(blank=True, null=True)),
-                ('cliente', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.cliente')),
-                ('usuario', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-            ],
-        ),
-        migrations.AddField(
-            model_name='pedido',
-            name='presupuesto',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='core.presupuesto'),
-        ),
+        ),        ),
         migrations.CreateModel(
             name='Producto',
             fields=[

@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h1>Presupuestos</h1>
+<p>
+    <a href="{% url 'presupuesto_create' %}">Nuevo</a> |
+    <a href="{% url 'presupuesto_export_csv' %}">CSV</a> |
+    <a href="{% url 'presupuesto_export_pdf' %}">PDF</a> |
+    <a href="{% url 'presupuesto_export_html' %}">HTML</a>
+</p>
+<table>
+    <tr>
+        <th>Número</th>
+        <th>Cliente</th>
+        <th>Total</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+    </tr>
+    {% for p in presupuestos %}
+    <tr>
+        <td>{{ p.numero }}</td>
+        <td>{{ p.cliente.nombre }}</td>
+        <td>{{ p.total }}</td>
+        <td>{{ p.estado }}</td>
+        <td>
+            <a href="{% url 'presupuesto_update' p.pk %}">Editar</a> |
+            <a href="{% url 'presupuesto_delete' p.pk %}">Eliminar</a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">Sin registros</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}
