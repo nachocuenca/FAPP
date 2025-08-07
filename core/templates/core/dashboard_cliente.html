@@ -1,0 +1,8 @@
+{% extends 'core/base_lte.html' %}
+{% block title %}Dashboard Cliente{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <h2>Bienvenido, {{ request.user.username }}</h2>
+  <p>Aquí verás tus clientes y tus datos personalizados.</p>
+</div>
+{% endblock %}

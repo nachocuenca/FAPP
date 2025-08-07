@@ -1,0 +1,45 @@
+
+/* General font settings */
+body, .content-wrapper, .main-sidebar, .nav-sidebar .nav-link, .form-control, .card-title {
+    font-size: 1.1rem;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Sidebar links */
+.main-sidebar .nav-link {
+    padding: 12px 18px;
+    font-size: 1.15rem;
+}
+
+.main-sidebar .nav-link i.nav-icon {
+    font-size: 1.2rem;
+    margin-right: 8px;
+}
+
+/* Brand logo */
+.brand-link {
+    font-size: 1.3rem !important;
+    padding: 1rem 1.25rem;
+}
+
+/* Buttons */
+.btn {
+    font-size: 1.05rem;
+    padding: 0.5rem 1rem;
+}
+
+/* Inputs */
+.form-control {
+    font-size: 1.05rem;
+    padding: 0.5rem 0.75rem;
+}
+
+/* Table headers */
+.table th {
+    font-size: 1.05rem;
+}
+
+/* Section spacing */
+.content {
+    padding-top: 1.5rem;
+}
