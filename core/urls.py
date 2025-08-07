@@ -11,6 +11,8 @@ urlpatterns = [
     path('clientes/nuevo/', views.cliente_nuevo, name='cliente_nuevo'),
     path('clientes/editar/<int:pk>/', views.cliente_editar, name='cliente_editar'),
     path('clientes/export/csv/', views.cliente_export_csv, name='cliente_export_csv'),
+    path('clientes/export/pdf/', views.cliente_export_pdf, name='cliente_export_pdf'),
+    path('clientes/print/html/', views.cliente_print_html, name='cliente_print_html'),
 
     # Presupuestos
     path('presupuestos/', views.presupuestos_list, name='presupuestos_list'),
