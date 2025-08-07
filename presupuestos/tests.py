@@ -95,3 +95,57 @@ class PresupuestoCRUDTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
         self.assertTrue(response.content.startswith(b"%PDF"))
+
+
+class PresupuestoPermissionTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.user1 = User.objects.create_user(username="user1", password="pass")
+        self.user2 = User.objects.create_user(username="user2", password="pass")
+        self.cliente1 = Cliente.objects.create(usuario=self.user1, nombre="Cliente1")
+        self.cliente2 = Cliente.objects.create(usuario=self.user2, nombre="Cliente2")
+        self.presupuesto_ajeno = Presupuesto.objects.create(
+            usuario=self.user2,
+            cliente=self.cliente2,
+            fecha="2024-01-01",
+            concepto="Ajeno",
+            total=100,
+        )
+        self.client.force_login(self.user1)
+
+    def test_list_only_user_presupuestos(self):
+        Presupuesto.objects.create(
+            usuario=self.user1,
+            cliente=self.cliente1,
+            fecha="2024-01-02",
+            concepto="Propio",
+            total=50,
+        )
+        response = self.client.get(reverse("presupuesto_list"))
+        self.assertContains(response, "Cliente1")
+        self.assertNotContains(response, "Cliente2")
+
+    def test_cannot_update_other_users_presupuesto(self):
+        response = self.client.get(
+            reverse("presupuesto_update", args=[self.presupuesto_ajeno.pk])
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_cannot_delete_other_users_presupuesto(self):
+        response = self.client.post(
+            reverse("presupuesto_delete", args=[self.presupuesto_ajeno.pk])
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_export_csv_excludes_other_users_presupuestos(self):
+        Presupuesto.objects.create(
+            usuario=self.user1,
+            cliente=self.cliente1,
+            fecha="2024-01-02",
+            concepto="Propio",
+            total=50,
+        )
+        response = self.client.get(reverse("presupuesto_export_csv"))
+        content = response.content.decode()
+        self.assertIn("Cliente1", content)
+        self.assertNotIn("Cliente2", content)
