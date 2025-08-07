@@ -71,12 +71,8 @@ class Actuacion(models.Model):
     descripcion = models.TextField()
     coste = models.DecimalField(max_digits=10, decimal_places=2)
 
-
     def __str__(self) -> str:  # pragma: no cover - string representation
         return f"Actuación #{self.pk} - {self.cliente.nombre}"
-
-    def __str__(self):
-        return f'Actuación de Pedido #{self.pedido.pk}'
 
 
 class Factura(models.Model):

@@ -11,11 +11,14 @@ def cliente_export_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="clientes.csv"'
     writer = csv.writer(response)
-    writer.writerow(['Nombre', 'CIF', 'Email', 'Teléfono', 'Dirección', 'Activo'])
+    writer.writerow(['Nombre', 'CIF', 'Email', 'Teléfono', 'Activo'])
+
 
     clientes = Cliente.objects.filter(usuario=request.user)
     for c in clientes:
-        writer.writerow([c.nombre, c.cif, c.email, c.telefono, c.direccion, 'Sí' if c.activo else 'No'])
+
+        writer.writerow([c.nombre, c.cif, c.email, c.telefono, 'Sí' if c.activo else 'No'])
+
 
     return response
 

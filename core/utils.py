@@ -1,7 +1,10 @@
 import csv
+import logging
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
+
+logger = logging.getLogger(__name__)
 
 
 def export_csv(queryset, fields, filename="export.csv"):
@@ -15,13 +18,17 @@ def export_csv(queryset, fields, filename="export.csv"):
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = f"attachment; filename=\"{filename}\""
     writer = csv.writer(response)
-    headers = [label if isinstance(field, (tuple, list)) else field for field in fields]
+    headers = [field[1] if isinstance(field, (tuple, list)) else field for field in fields]
     writer.writerow(headers)
     for obj in queryset:
         row = []
         for field in fields:
             attr = field[0] if isinstance(field, (tuple, list)) else field
-            value = getattr(obj, attr)
+            try:
+                value = getattr(obj, attr)
+            except Exception as e:
+                logger.error("Failed to get attribute '%s' from %r: %s", attr, obj, e)
+                value = ""
             row.append(value)
         writer.writerow(row)
     return response
