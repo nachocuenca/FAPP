@@ -1,9 +1,12 @@
 from django import forms
-from presupuestos.forms import PresupuestoForm
-from .models import Cliente, Pedido, Actuacion, Factura
+from .models import Cliente, Pedido, Actuacion, Factura, Presupuesto
 
 
 class ClienteForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request", None)
+        super().__init__(*args, **kwargs)
+
     class Meta:
         model = Cliente
         fields = ['nombre', 'email', 'telefono', 'direccion', 'activo']
@@ -24,6 +27,17 @@ class ClienteForm(forms.ModelForm):
 
 
 class PedidoForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request", None)
+        super().__init__(*args, **kwargs)
+        if self.request:
+            self.fields['cliente'].queryset = Cliente.objects.filter(
+                usuario=self.request.user
+            )
+            self.fields['presupuesto'].queryset = Presupuesto.objects.filter(
+                usuario=self.request.user
+            )
+
     class Meta:
         model = Pedido
         fields = ['cliente', 'presupuesto', 'fecha', 'descripcion', 'total']
@@ -44,6 +58,17 @@ class PedidoForm(forms.ModelForm):
 
 
 class ActuacionForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request", None)
+        super().__init__(*args, **kwargs)
+        if self.request:
+            self.fields['cliente'].queryset = Cliente.objects.filter(
+                usuario=self.request.user
+            )
+            self.fields['pedido'].queryset = Pedido.objects.filter(
+                usuario=self.request.user
+            )
+
     class Meta:
         model = Actuacion
         fields = ['cliente', 'pedido', 'fecha', 'descripcion', 'coste']
@@ -67,6 +92,21 @@ class FacturaForm(forms.ModelForm):
         label='Total (€)', required=False, disabled=True,
         widget=forms.NumberInput(attrs={'class': 'form-control'})
     )
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request", None)
+        super().__init__(*args, **kwargs)
+        if self.request:
+            self.fields['cliente'].queryset = Cliente.objects.filter(
+                usuario=self.request.user
+            )
+            self.fields['pedido'].queryset = Pedido.objects.filter(
+                usuario=self.request.user
+            )
+            self.fields['actuacion'].queryset = Actuacion.objects.filter(
+                usuario=self.request.user
+            )
+
     class Meta:
         model = Factura
         fields = ['cliente', 'pedido', 'actuacion', 'fecha', 'numero', 'base_imponible', 'iva', 'irpf', 'estado']
