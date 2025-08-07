@@ -62,12 +62,22 @@ Base de datos
 3. Configura las variables de entorno para la conexión:
 
    ```bash
-   export POSTGRES_DB=fappdb
-   export POSTGRES_USER=fappuser
-   export POSTGRES_PASSWORD=fapppass
-   export POSTGRES_HOST=localhost
-   export POSTGRES_PORT=5432
-   ```
+    export POSTGRES_DB=fappdb
+    export POSTGRES_USER=fappuser
+    export POSTGRES_PASSWORD=fapppass
+    export POSTGRES_HOST=localhost
+    export POSTGRES_PORT=5432
+```
+
+Configuración en nuevos entornos
+-------------------------------
+
+Al iniciar la aplicación se verifica que las librerías externas
+`xhtml2pdf` y `reportlab` estén instaladas y que la conexión con la base
+de datos sea posible. Si falta alguna de estas dependencias o las
+variables de entorno `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`,
+`POSTGRES_HOST` o `POSTGRES_PORT`, se mostrará un mensaje de error
+descriptivo para facilitar la configuración del entorno.
 
 Migraciones y servidor
 ----------------------
