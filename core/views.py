@@ -1,13 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from .models import Cliente, Presupuesto, Pedido, Actuacion, Factura
+from .models import Cliente, Pedido, Actuacion, Factura
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 import csv
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from .forms import ClienteForm, PresupuestoForm, PedidoForm, ActuacionForm, FacturaForm
+from .forms import ClienteForm, PedidoForm, ActuacionForm, FacturaForm
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from .utils import export_csv, export_pdf, render_html
@@ -71,7 +71,6 @@ def cliente_print_html(request):
     context = {'clientes': clientes}
     return render_html('core/clientes_pdf.html', context)
 
-# --- Pedidos ---
 @login_required
 def pedidos_list(request):
     pedidos = Pedido.objects.all()
@@ -99,47 +98,8 @@ def pedido_editar(request, pk):
             form.save()
             return redirect('pedidos_list')
     else:
-        form = PresupuestoForm(instance=presupuesto)
-    return render(request, 'core/presupuestos/presupuesto_form.html', {'form': form})
-
-@login_required
-def presupuesto_export_csv(request):
-    return HttpResponse("Exportar CSV (presupuestos)")
-
-@login_required
-def presupuesto_export_pdf(request):
-    return HttpResponse("Exportar PDF (presupuestos)")
-
-# --- Pedidos ---
-@login_required
-def pedidos_list(request):
-    pedidos = Pedido.objects.all()
-    return render(request, 'core/pedidos/pedidos_list.html', {'pedidos': pedidos})
-
-@login_required
-def pedido_nuevo(request):
-    if request.method == 'POST':
-        form = PedidoForm(request.POST)
-        if form.is_valid():
-            pedido = form.save(commit=False)
-            pedido.usuario = request.user
-            pedido.save()
-            return redirect('pedidos_list')
-    else:
-        form = PedidoForm()
-    return render(request, 'core/pedidos/pedido_form.html', {'form': form})
-
-@login_required
-def pedido_editar(request, pk):
-    pedido = get_object_or_404(Pedido, pk=pk)
-    if request.method == 'POST':
-        form = PedidoForm(request.POST, instance=pedido)
-        if form.is_valid():
-            form.save()
-            return redirect('pedidos_list')
-    else:
         form = PedidoForm(instance=pedido)
-    return render(request, 'core/pedidos/pedido_form.html', {'form': form})
+    return render(request, 'core/pedidos/pedido_form.html', {'form': form, 'modo': 'editar'})
 
 @login_required
 def pedido_export_csv(request):
