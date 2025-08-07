@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Cliente, Presupuesto, Pedido, Actuacion, Factura
-from .forms import ClienteForm, PresupuestoForm
+from .forms import ClienteForm, PresupuestoForm, PedidoForm, ActuacionForm
 from django.http import HttpResponse
 import csv
 
@@ -89,28 +89,80 @@ def presupuesto_export_pdf(request):
 # --- Pedidos ---
 @login_required
 def pedidos_list(request):
-    return render(request, 'core/pedidos/pedidos_list.html')
+    pedidos = Pedido.objects.all()
+    return render(request, 'core/pedidos/pedidos_list.html', {'pedidos': pedidos})
 
 @login_required
 def pedido_nuevo(request):
-    return render(request, 'core/pedidos/pedido_form.html')
+    if request.method == 'POST':
+        form = PedidoForm(request.POST)
+        if form.is_valid():
+            pedido = form.save(commit=False)
+            pedido.usuario = request.user
+            pedido.save()
+            return redirect('pedidos_list')
+    else:
+        form = PedidoForm()
+    return render(request, 'core/pedidos/pedido_form.html', {'form': form})
 
 @login_required
 def pedido_editar(request, pk):
-    return render(request, 'core/pedidos/pedido_form.html')
+    pedido = get_object_or_404(Pedido, pk=pk)
+    if request.method == 'POST':
+        form = PedidoForm(request.POST, instance=pedido)
+        if form.is_valid():
+            form.save()
+            return redirect('pedidos_list')
+    else:
+        form = PedidoForm(instance=pedido)
+    return render(request, 'core/pedidos/pedido_form.html', {'form': form})
 
 # --- Actuaciones ---
 @login_required
 def actuaciones_list(request):
-    return render(request, 'core/actuaciones/actuaciones_list.html')
+    actuaciones = Actuacion.objects.all()
+    return render(request, 'core/actuaciones/actuaciones_list.html', {'actuaciones': actuaciones})
 
 @login_required
 def actuacion_nueva(request):
-    return render(request, 'core/actuaciones/actuacion_form.html')
+    if request.method == 'POST':
+        form = ActuacionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('actuaciones_list')
+    else:
+        form = ActuacionForm()
+    return render(request, 'core/actuaciones/actuacion_form.html', {'form': form})
 
 @login_required
 def actuacion_editar(request, pk):
-    return render(request, 'core/actuaciones/actuacion_form.html')
+    actuacion = get_object_or_404(Actuacion, pk=pk)
+    if request.method == 'POST':
+        form = ActuacionForm(request.POST, instance=actuacion)
+        if form.is_valid():
+            form.save()
+            return redirect('actuaciones_list')
+    else:
+        form = ActuacionForm(instance=actuacion)
+    return render(request, 'core/actuaciones/actuacion_form.html', {'form': form})
+
+@login_required
+def actuacion_eliminar(request, pk):
+    actuacion = get_object_or_404(Actuacion, pk=pk)
+    if request.method == 'POST':
+        actuacion.delete()
+        return redirect('actuaciones_list')
+    return render(request, 'core/actuaciones/actuacion_confirm_delete.html', {'actuacion': actuacion})
+
+@login_required
+def actuaciones_export_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="actuaciones.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['Pedido', 'Fecha', 'Descripción', 'Coste'])
+    for act in Actuacion.objects.all():
+        writer.writerow([act.pedido.id, act.fecha, act.descripcion, act.coste])
+    return response
 
 # --- Facturas ---
 @login_required

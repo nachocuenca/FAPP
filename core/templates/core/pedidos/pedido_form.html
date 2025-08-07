@@ -1,1 +1,11 @@
-<h1>Formulario de pedido</h1>
+{% extends 'core/base.html' %}
+{% block title %}Pedido{% endblock %}
+{% block content %}
+<h1>{% if form.instance.pk %}Editar{% else %}Nuevo{% endif %} pedido</h1>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">Guardar</button>
+  <a href="{% url 'pedidos_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}
