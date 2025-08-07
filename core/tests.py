@@ -2,7 +2,9 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from unittest.mock import patch
+
 from .models import Cliente, Pedido, Factura, Actuacion
+from .utils import export_csv
 
 
 class FacturaTests(TestCase):
@@ -217,7 +219,6 @@ class ActuacionCRUDTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Export", response.content)
 
-
 @override_settings(
     TEMPLATES=[
         {
@@ -358,3 +359,4 @@ class AccessControlTests(TestCase):
             f"/accounts/login/?next={reverse('facturas_list')}",
             fetch_redirect_response=False,
         )
+
