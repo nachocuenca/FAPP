@@ -8,13 +8,13 @@ from reportlab.pdfgen import canvas
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
-from core.forms import ClienteForm
-from core.models import Cliente
+from .forms import ClienteForm
+from .models import Cliente
 
 
 class ClienteListView(LoginRequiredMixin, ListView):
     model = Cliente
-    template_name = 'core/clientes/cliente_list.html'
+    template_name = 'clientes/cliente_list.html'
 
     def get_queryset(self):
         return Cliente.objects.filter(usuario=self.request.user)
@@ -23,7 +23,7 @@ class ClienteListView(LoginRequiredMixin, ListView):
 class ClienteCreateView(LoginRequiredMixin, CreateView):
     model = Cliente
     form_class = ClienteForm
-    template_name = 'core/clientes/cliente_form.html'
+    template_name = 'clientes/cliente_form.html'
     success_url = reverse_lazy('clientes:cliente_list')
 
     def form_valid(self, form):
@@ -34,7 +34,7 @@ class ClienteCreateView(LoginRequiredMixin, CreateView):
 class ClienteUpdateView(LoginRequiredMixin, UpdateView):
     model = Cliente
     form_class = ClienteForm
-    template_name = 'core/clientes/cliente_form.html'
+    template_name = 'clientes/cliente_form.html'
     success_url = reverse_lazy('clientes:cliente_list')
 
     def get_queryset(self):
@@ -47,7 +47,7 @@ class ClienteUpdateView(LoginRequiredMixin, UpdateView):
 
 class ClienteDeleteView(LoginRequiredMixin, DeleteView):
     model = Cliente
-    template_name = 'core/clientes/cliente_confirm_delete.html'
+    template_name = 'clientes/cliente_confirm_delete.html'
     success_url = reverse_lazy('clientes:cliente_list')
 
     def get_queryset(self):
@@ -85,4 +85,4 @@ def cliente_export_pdf(request):
 @login_required
 def cliente_print(request):
     clientes = Cliente.objects.filter(usuario=request.user)
-    return render(request, 'core/clientes/clientes_print.html', {'clientes': clientes})
+    return render(request, 'clientes/clientes_print.html', {'clientes': clientes})

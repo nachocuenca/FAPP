@@ -1,7 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from core.models import Cliente, Presupuesto
+from clientes.models import Cliente
+from .models import Presupuesto
 
 
 class PresupuestoCRUDTests(TestCase):

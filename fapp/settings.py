@@ -42,6 +42,10 @@ INSTALLED_APPS = [
     'presupuestos',
     'plantillas',
     'configuracion',
+    'pedidos',
+    'actuaciones',
+    'facturas',
+    'usuarios',
 ]
 
 MIDDLEWARE = [
@@ -132,7 +136,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-AUTH_USER_MODEL = 'core.Usuario'
+AUTH_USER_MODEL = 'usuarios.Usuario'
 
 SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "True").lower() in ("true", "1")
 SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "True").lower() in ("true", "1")

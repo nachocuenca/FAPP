@@ -1,5 +1,6 @@
 from django import forms
-from core.models import Presupuesto, Cliente
+from clientes.models import Cliente
+from .models import Presupuesto
 
 class PresupuestoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
