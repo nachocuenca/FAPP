@@ -11,7 +11,7 @@ from core.models import Cliente
 @login_required
 def cliente_list(request):
     clientes = Cliente.objects.filter(usuario=request.user)
-    return render(request, 'clientes/cliente_list.html', {'clientes': clientes})
+    return render(request, 'core/clientes/cliente_list.html', {'clientes': clientes})
 
 
 @login_required
@@ -25,7 +25,7 @@ def cliente_create(request):
             return redirect('clientes:cliente_list')
     else:
         form = ClienteForm()
-    return render(request, 'clientes/cliente_form.html', {'form': form})
+    return render(request, 'core/clientes/cliente_form.html', {'form': form})
 
 
 @login_required
@@ -40,7 +40,7 @@ def cliente_edit(request, pk):
             return redirect('clientes:cliente_list')
     else:
         form = ClienteForm(instance=cliente)
-    return render(request, 'clientes/cliente_form.html', {'form': form})
+    return render(request, 'core/clientes/cliente_form.html', {'form': form})
 
 
 @login_required
@@ -49,7 +49,7 @@ def cliente_delete(request, pk):
     if request.method == 'POST':
         cliente.delete()
         return redirect('clientes:cliente_list')
-    return render(request, 'clientes/cliente_confirm_delete.html', {'cliente': cliente})
+    return render(request, 'core/clientes/cliente_confirm_delete.html', {'cliente': cliente})
 
 
 @login_required
@@ -83,4 +83,4 @@ def cliente_export_pdf(request):
 @login_required
 def cliente_print(request):
     clientes = Cliente.objects.filter(usuario=request.user)
-    return render(request, 'clientes/clientes_print.html', {'clientes': clientes})
+    return render(request, 'core/clientes/clientes_print.html', {'clientes': clientes})
