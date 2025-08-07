@@ -1,21 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Facturas</title>
-</head>
-<body>
-  <h1>Listado de facturas</h1>
-  <table border="1" cellspacing="0" cellpadding="4">
-    <tr><th>Número</th><th>Cliente</th><th>Total</th></tr>
-    {% for factura in facturas %}
-    <tr>
-      <td>{{ factura.numero }}</td>
-      <td>{{ factura.cliente.nombre }}</td>
-      <td>{{ factura.total }}</td>
-    </tr>
-    {% endfor %}
-  </table>
-</body>
-</html>
-
+<html><body>
+<h1>Facturas</h1>
+<ul>
+{% for f in facturas %}
+<li>{{ f.numero }} - {{ f.total }}</li>
+{% endfor %}
+</ul>
+</body></html>

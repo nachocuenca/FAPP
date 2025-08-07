@@ -1,11 +1,9 @@
-{% extends 'core/base.html' %}
-{% block title %}Eliminar actuación{% endblock %}
+{% extends "core/base.html" %}
 {% block content %}
 <h1>Eliminar actuación</h1>
+<p>¿Desea eliminar {{ actuacion }}?</p>
 <form method="post">
   {% csrf_token %}
-  <p>¿Seguro que deseas eliminar la actuación del {{ actuacion.fecha }}?</p>
   <button type="submit" class="btn btn-danger">Eliminar</button>
-  <a href="{% url 'actuaciones_list' %}" class="btn btn-secondary">Cancelar</a>
 </form>
 {% endblock %}
