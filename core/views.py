@@ -21,6 +21,7 @@ def clientes_list(request):
     clientes = Cliente.objects.filter(usuario=request.user)
     return render(request, 'core/clientes/clientes_list.html', {'clientes': clientes})
 
+
 @login_required
 def cliente_nuevo(request):
     if request.method == "POST":
