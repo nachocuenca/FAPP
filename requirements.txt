@@ -4,3 +4,4 @@ xhtml2pdf>=0.2
 django-adminlte3>=0.1
 django-bootstrap5>=23.3
 Pillow>=9.0
+reportlab>=3.6
