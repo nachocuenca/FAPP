@@ -1,1 +1,36 @@
-<h1>Listado de actuaciones</h1>
+{% extends 'core/base.html' %}
+{% block title %}Actuaciones{% endblock %}
+{% block content %}
+<h1>Actuaciones</h1>
+<div class="mb-3">
+  <a href="{% url 'actuacion_nueva' %}" class="btn btn-primary">Nueva actuación</a>
+  <a href="{% url 'actuaciones_export_csv' %}" class="btn btn-secondary">Exportar CSV</a>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Pedido</th>
+      <th>Fecha</th>
+      <th>Descripción</th>
+      <th>Coste</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for actuacion in actuaciones %}
+    <tr>
+      <td>{{ actuacion.pedido.id }}</td>
+      <td>{{ actuacion.fecha }}</td>
+      <td>{{ actuacion.descripcion }}</td>
+      <td>{{ actuacion.coste }}</td>
+      <td>
+        <a href="{% url 'actuacion_editar' actuacion.pk %}" class="btn btn-sm btn-warning">Editar</a>
+        <a href="{% url 'actuacion_eliminar' actuacion.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">No hay actuaciones.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

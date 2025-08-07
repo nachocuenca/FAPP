@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Cliente, Presupuesto, Pedido, Actuacion, Factura
+from .models import Usuario, Cliente, Presupuesto, Pedido, Actuacion, Factura
 
+admin.site.register(Usuario)
 admin.site.register(Cliente)
 admin.site.register(Presupuesto)
 admin.site.register(Pedido)

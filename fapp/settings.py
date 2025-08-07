@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import os
 
@@ -17,8 +16,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'clientes',
+    'adminlte3',
+    'adminlte3_theme',
+    'django_bootstrap5',
     'core',
+    'clientes',
+    'presupuestos',
+    'pedidos',
+    'actuaciones',
+    'facturas',
+    'plantillas',
+    'configuracion',
 ]
+
+AUTH_USER_MODEL = 'core.Usuario'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -35,7 +47,7 @@ ROOT_URLCONF = 'fapp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'core' / 'templates'],
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -52,10 +64,16 @@ WSGI_APPLICATION = 'fapp.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'fappdb'),
+        'USER': os.getenv('POSTGRES_USER', 'fappuser'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'fapppass'),
+        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),
     }
 }
+
+AUTH_USER_MODEL = 'core.Usuario'
 
 AUTH_PASSWORD_VALIDATORS = []
 
@@ -69,8 +87,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+AUTH_USER_MODEL = 'core.Usuario'

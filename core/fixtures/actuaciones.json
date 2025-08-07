@@ -1,0 +1,48 @@
+[
+  {
+    "model": "core.usuario",
+    "pk": 1,
+    "fields": {
+      "username": "demo",
+      "password": "pbkdf2_sha256$1000000$irtpeuAV7wwSXkJMQeP85I$qyJAC2n8OuGHnfdsKOcT/vfBgRyuDGIF8i0DA+cmewU=",
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.cliente",
+    "pk": 1,
+    "fields": {
+      "usuario": 1,
+      "nombre": "Cliente Demo",
+      "cif": "",
+      "direccion": "",
+      "email": "",
+      "telefono": "",
+      "activo": true
+    }
+  },
+  {
+    "model": "core.pedido",
+    "pk": 1,
+    "fields": {
+      "usuario": 1,
+      "cliente": 1,
+      "presupuesto": null,
+      "fecha": "2024-01-01",
+      "descripcion": "Pedido de prueba",
+      "total": "100.00"
+    }
+  },
+  {
+    "model": "core.actuacion",
+    "pk": 1,
+    "fields": {
+      "pedido": 1,
+      "fecha": "2024-01-02",
+      "descripcion": "Instalación de equipo",
+      "coste": "80.00"
+    }
+  }
+]

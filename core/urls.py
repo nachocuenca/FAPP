@@ -1,6 +1,5 @@
-
 from django.urls import path
-from . import views  # Esta importación es obligatoria
+from . import views
 
 urlpatterns = [
     # Dashboard
@@ -11,23 +10,22 @@ urlpatterns = [
     path('clientes/nuevo/', views.cliente_nuevo, name='cliente_nuevo'),
     path('clientes/editar/<int:pk>/', views.cliente_editar, name='cliente_editar'),
     path('clientes/export/csv/', views.cliente_export_csv, name='cliente_export_csv'),
-
-    # Presupuestos
-    path('presupuestos/', views.presupuestos_list, name='presupuestos_list'),
-    path('presupuestos/nuevo/', views.presupuesto_nuevo, name='presupuesto_nuevo'),
-    path('presupuestos/editar/<int:pk>/', views.presupuesto_editar, name='presupuesto_editar'),
-    path('presupuestos/export/csv/', views.presupuesto_export_csv, name='presupuesto_export_csv'),
-    path('presupuestos/export/pdf/', views.presupuesto_export_pdf, name='presupuesto_export_pdf'),
+    path('clientes/export/pdf/', views.cliente_export_pdf, name='cliente_export_pdf'),
+    path('clientes/print/html/', views.cliente_print_html, name='cliente_print_html'),
 
     # Pedidos
     path('pedidos/', views.pedidos_list, name='pedidos_list'),
     path('pedidos/nuevo/', views.pedido_nuevo, name='pedido_nuevo'),
     path('pedidos/editar/<int:pk>/', views.pedido_editar, name='pedido_editar'),
+    path('pedidos/export/csv/', views.pedido_export_csv, name='pedido_export_csv'),
+    path('pedidos/export/pdf/', views.pedido_export_pdf, name='pedido_export_pdf'),
 
     # Actuaciones
     path('actuaciones/', views.actuaciones_list, name='actuaciones_list'),
     path('actuaciones/nueva/', views.actuacion_nueva, name='actuacion_nueva'),
     path('actuaciones/editar/<int:pk>/', views.actuacion_editar, name='actuacion_editar'),
+    path('actuaciones/eliminar/<int:pk>/', views.actuacion_eliminar, name='actuacion_eliminar'),
+    path('actuaciones/export/csv/', views.actuaciones_export_csv, name='actuaciones_export_csv'),
 
     # Facturas
     path('facturas/', views.facturas_list, name='facturas_list'),
