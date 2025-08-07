@@ -29,6 +29,10 @@ export DEBUG='False'  # o 'True' en desarrollo
 export ALLOWED_HOSTS='localhost,127.0.0.1'
 ```
 
+Si no defines `SECRET_KEY`, el proyecto utilizará un valor por defecto
+válido solo para entornos de desarrollo. **En producción debes establecer
+siempre esta variable.**
+
 
 Dependencias
 ------------

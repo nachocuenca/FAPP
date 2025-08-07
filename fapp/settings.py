@@ -3,7 +3,9 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ["SECRET_KEY"]
+# En producción este valor debe definirse mediante la variable de entorno
+# SECRET_KEY. El valor por defecto sólo debe usarse durante el desarrollo.
+SECRET_KEY = os.environ.get("SECRET_KEY", "definir-en-produccion")
 
 DEBUG = os.environ.get("DEBUG", "False").lower() in ("true", "1")
 
