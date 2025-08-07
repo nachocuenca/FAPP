@@ -3,9 +3,9 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-clave-secreta'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-clave-secreta')
 
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = []
 
@@ -21,7 +21,6 @@ INSTALLED_APPS = [
     'adminlte3_theme',
     'django_bootstrap5',
     'core',
-    'clientes',
     'presupuestos',
     'pedidos',
     'actuaciones',
@@ -29,8 +28,6 @@ INSTALLED_APPS = [
     'plantillas',
     'configuracion',
 ]
-
-AUTH_USER_MODEL = 'core.Usuario'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -72,8 +69,6 @@ DATABASES = {
         'PORT': os.getenv('POSTGRES_PORT', '5432'),
     }
 }
-
-AUTH_USER_MODEL = 'core.Usuario'
 
 AUTH_PASSWORD_VALIDATORS = []
 
