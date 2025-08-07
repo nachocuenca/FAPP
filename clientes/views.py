@@ -9,7 +9,7 @@ from core.models import Cliente
 
 
 def cliente_list(request):
-    clientes = Cliente.objects.all()
+    clientes = Cliente.objects.filter(usuario=request.user)
     return render(request, 'clientes/cliente_list.html', {'clientes': clientes})
 
 
@@ -27,7 +27,7 @@ def cliente_create(request):
 
 
 def cliente_edit(request, pk):
-    cliente = get_object_or_404(Cliente, pk=pk)
+    cliente = get_object_or_404(Cliente, pk=pk, usuario=request.user)
     if request.method == 'POST':
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
@@ -41,7 +41,7 @@ def cliente_edit(request, pk):
 
 
 def cliente_delete(request, pk):
-    cliente = get_object_or_404(Cliente, pk=pk)
+    cliente = get_object_or_404(Cliente, pk=pk, usuario=request.user)
     if request.method == 'POST':
         cliente.delete()
         return redirect('clientes:cliente_list')
@@ -53,7 +53,7 @@ def cliente_export_csv(request):
     response['Content-Disposition'] = 'attachment; filename="clientes.csv"'
     writer = csv.writer(response)
     writer.writerow(['Nombre', 'Email', 'Telefono', 'Direccion'])
-    for c in Cliente.objects.all():
+    for c in Cliente.objects.filter(usuario=request.user):
         writer.writerow([c.nombre, c.email, c.telefono, c.direccion])
     return response
 
@@ -62,7 +62,7 @@ def cliente_export_pdf(request):
     buffer = BytesIO()
     p = canvas.Canvas(buffer)
     y = 800
-    for c in Cliente.objects.all():
+    for c in Cliente.objects.filter(usuario=request.user):
         p.drawString(50, y, f"{c.nombre} - {c.email or ''} - {c.telefono or ''}")
         y -= 20
         if y < 50:
@@ -75,5 +75,5 @@ def cliente_export_pdf(request):
 
 
 def cliente_print(request):
-    clientes = Cliente.objects.all()
+    clientes = Cliente.objects.filter(usuario=request.user)
     return render(request, 'clientes/clientes_print.html', {'clientes': clientes})
