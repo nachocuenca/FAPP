@@ -18,8 +18,8 @@ def dashboard(request):
 # --- Clientes ---
 @login_required
 def clientes_list(request):
-    clientes = Cliente.objects.all()
-    return render(request, 'core/clientes_list.html', {"clientes": clientes})
+    clientes = Cliente.objects.filter(usuario=request.user)
+    return render(request, 'core/clientes/clientes_list.html', {'clientes': clientes})
 
 @login_required
 def cliente_nuevo(request):
@@ -40,8 +40,9 @@ def cliente_nuevo(request):
 
 @login_required
 def cliente_editar(request, pk):
-    cliente = get_object_or_404(Cliente, pk=pk)
-    if request.method == "POST":
+
+    cliente = get_object_or_404(Cliente, pk=pk, usuario=request.user)
+    if request.method == 'POST':
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
             form.save()
@@ -56,7 +57,7 @@ def cliente_editar(request, pk):
 
 @login_required
 def cliente_export_csv(request):
-    queryset = Cliente.objects.all()
+    queryset = Cliente.objects.filter(usuario=request.user)
     fields = [
         ('nombre', 'Nombre'),
         ('email', 'Email'),
@@ -67,20 +68,20 @@ def cliente_export_csv(request):
 
 @login_required
 def cliente_export_pdf(request):
-    clientes = Cliente.objects.all()
+    clientes = Cliente.objects.filter(usuario=request.user)
     context = {'clientes': clientes}
     return export_pdf('core/clientes_pdf.html', context, 'clientes.pdf')
 
 
 @login_required
 def cliente_print_html(request):
-    clientes = Cliente.objects.all()
+    clientes = Cliente.objects.filter(usuario=request.user)
     context = {'clientes': clientes}
     return render_html('core/clientes_pdf.html', context)
 
 @login_required
 def pedidos_list(request):
-    pedidos = Pedido.objects.all()
+    pedidos = Pedido.objects.filter(usuario=request.user)
     return render(request, 'core/pedidos/pedidos_list.html', {'pedidos': pedidos})
 
 @login_required
@@ -98,7 +99,7 @@ def pedido_nuevo(request):
 
 @login_required
 def pedido_editar(request, pk):
-    pedido = get_object_or_404(Pedido, pk=pk)
+    pedido = get_object_or_404(Pedido, pk=pk, usuario=request.user)
     if request.method == 'POST':
         form = PedidoForm(request.POST, instance=pedido)
         if form.is_valid():
@@ -114,13 +115,13 @@ def pedido_export_csv(request):
     response['Content-Disposition'] = 'attachment; filename="pedidos.csv"'
     writer = csv.writer(response)
     writer.writerow(['Fecha', 'Cliente', 'Presupuesto', 'Total'])
-    for p in Pedido.objects.all():
+    for p in Pedido.objects.filter(usuario=request.user):
         writer.writerow([p.fecha, p.cliente.nombre, p.presupuesto.id if p.presupuesto else '', p.total])
     return response
 
 @login_required
 def pedido_export_pdf(request):
-    pedidos = Pedido.objects.all()
+    pedidos = Pedido.objects.filter(usuario=request.user)
     template = get_template('core/pedidos/pedidos_pdf.html')
     html = template.render({'pedidos': pedidos})
     response = HttpResponse(content_type='application/pdf')
@@ -132,7 +133,7 @@ def pedido_export_pdf(request):
 # --- Actuaciones ---
 @login_required
 def actuaciones_list(request):
-    actuaciones = Actuacion.objects.all()
+    actuaciones = Actuacion.objects.filter(usuario=request.user)
     return render(request, 'core/actuaciones/actuaciones_list.html', {'actuaciones': actuaciones})
 
 @login_required
@@ -150,7 +151,7 @@ def actuacion_nueva(request):
 
 @login_required
 def actuacion_editar(request, pk):
-    actuacion = get_object_or_404(Actuacion, pk=pk)
+    actuacion = get_object_or_404(Actuacion, pk=pk, usuario=request.user)
     if request.method == 'POST':
         form = ActuacionForm(request.POST, instance=actuacion)
         if form.is_valid():
@@ -162,7 +163,7 @@ def actuacion_editar(request, pk):
 
 @login_required
 def actuacion_eliminar(request, pk):
-    actuacion = get_object_or_404(Actuacion, pk=pk)
+    actuacion = get_object_or_404(Actuacion, pk=pk, usuario=request.user)
     if request.method == 'POST':
         actuacion.delete()
         return redirect('actuaciones_list')
@@ -174,14 +175,14 @@ def actuaciones_export_csv(request):
     response['Content-Disposition'] = 'attachment; filename="actuaciones.csv"'
     writer = csv.writer(response)
     writer.writerow(['Pedido', 'Fecha', 'Descripción', 'Coste'])
-    for act in Actuacion.objects.all():
+    for act in Actuacion.objects.filter(usuario=request.user):
         writer.writerow([act.pedido.id, act.fecha, act.descripcion, act.coste])
     return response
 
 # --- Facturas ---
 @login_required
 def facturas_list(request):
-    facturas = Factura.objects.all()
+    facturas = Factura.objects.filter(usuario=request.user)
     return render(
         request, "core/facturas/facturas_list.html", {"facturas": facturas}
     )
@@ -203,7 +204,7 @@ def factura_nueva(request):
 
 @login_required
 def factura_editar(request, pk):
-    factura = get_object_or_404(Factura, pk=pk)
+    factura = get_object_or_404(Factura, pk=pk, usuario=request.user)
     if request.method == "POST":
         form = FacturaForm(request.POST, instance=factura)
         if form.is_valid():
@@ -220,14 +221,14 @@ def factura_export_csv(request):
     response["Content-Disposition"] = 'attachment; filename="facturas.csv"'
     writer = csv.writer(response)
     writer.writerow(["Número", "Cliente", "Total"])
-    for factura in Factura.objects.all():
+    for factura in Factura.objects.filter(usuario=request.user):
         writer.writerow([factura.numero, factura.cliente.nombre, factura.total])
     return response
 
 
 @login_required
 def factura_export_html(request):
-    facturas = Factura.objects.all()
+    facturas = Factura.objects.filter(usuario=request.user)
     html = render_to_string(
         "core/facturas/facturas_export.html", {"facturas": facturas}
     )
@@ -243,7 +244,7 @@ def factura_export_pdf(request):
     p = canvas.Canvas(response, pagesize=letter)
     y = 770
     p.drawString(80, 800, "Listado de facturas")
-    for factura in Factura.objects.all():
+    for factura in Factura.objects.filter(usuario=request.user):
         p.drawString(
             80,
             y,
