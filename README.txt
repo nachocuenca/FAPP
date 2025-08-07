@@ -51,7 +51,7 @@ Base de datos
 -------------
 
 1. Asegúrate de tener un servidor de PostgreSQL en funcionamiento.
-2. Crea la base de datos y el usuario con las credenciales definidas en `fapp/settings.py`:
+2. Crea la base de datos y el usuario con las credenciales definidas en `fapp/settings/prod.py`:
 
    ```sql
    CREATE DATABASE fappdb;

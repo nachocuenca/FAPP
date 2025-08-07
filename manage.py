@@ -3,8 +3,11 @@
 import os
 import sys
 
+
 def main():
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fapp.settings')
+    settings_module = os.environ.get("DJANGO_SETTINGS_MODULE")
+    if not settings_module:
+        raise RuntimeError("DJANGO_SETTINGS_MODULE no está configurado.")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
