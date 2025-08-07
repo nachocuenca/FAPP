@@ -29,7 +29,9 @@ def cliente_nuevo(request):
     if request.method == 'POST':
         form = ClienteForm(request.POST)
         if form.is_valid():
-            form.save()
+            cliente = form.save(commit=False)
+            cliente.usuario = request.user
+            cliente.save()
             return redirect('clientes_list')
     else:
         form = ClienteForm()
@@ -133,7 +135,9 @@ def actuacion_nueva(request):
     if request.method == 'POST':
         form = ActuacionForm(request.POST)
         if form.is_valid():
-            form.save()
+            actuacion = form.save(commit=False)
+            actuacion.usuario = request.user
+            actuacion.save()
             return redirect('actuaciones_list')
     else:
         form = ActuacionForm()
