@@ -61,6 +61,8 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'core.Usuario'
+
 AUTH_PASSWORD_VALIDATORS = []
 
 LANGUAGE_CODE = 'es-es'
