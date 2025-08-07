@@ -1,12 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden
-from .models import Pedido, Actuacion, Factura
+from pedidos.models import Pedido
+from actuaciones.models import Actuacion
+from facturas.models import Factura
 from django.template.loader import render_to_string
 import csv
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from core.forms import PedidoForm, ActuacionForm, FacturaForm
+from pedidos.forms import PedidoForm
+from actuaciones.forms import ActuacionForm
+from facturas.forms import FacturaForm
 from .utils import export_csv, export_pdf
 
 
@@ -18,7 +22,7 @@ def dashboard(request):
 @login_required
 def pedidos_list(request):
     pedidos = Pedido.objects.filter(usuario=request.user)
-    return render(request, 'core/pedidos/pedidos_list.html', {'pedidos': pedidos})
+    return render(request, 'pedidos/pedidos_list.html', {'pedidos': pedidos})
 
 @login_required
 def pedido_nuevo(request):
@@ -37,7 +41,7 @@ def pedido_nuevo(request):
             return redirect('pedidos_list')
     else:
         form = PedidoForm(request=request)
-    return render(request, 'core/pedidos/pedido_form.html', {'form': form, 'modo': 'nuevo'})
+    return render(request, 'pedidos/pedido_form.html', {'form': form, 'modo': 'nuevo'})
 
 @login_required
 def pedido_editar(request, pk):
@@ -49,7 +53,7 @@ def pedido_editar(request, pk):
             return redirect('pedidos_list')
     else:
         form = PedidoForm(instance=pedido, request=request)
-    return render(request, 'core/pedidos/pedido_form.html', {'form': form, 'modo': 'editar'})
+    return render(request, 'pedidos/pedido_form.html', {'form': form, 'modo': 'editar'})
 
 @login_required
 def pedido_export_csv(request):
@@ -70,7 +74,7 @@ def pedido_export_pdf(request):
     pedidos = Pedido.objects.filter(usuario=request.user)
     context = {"pedidos": pedidos}
     try:
-        return export_pdf("core/pedidos/pedidos_pdf.html", context, "pedidos.pdf")
+        return export_pdf("pedidos/pedidos_pdf.html", context, "pedidos.pdf")
     except Exception as e:
         return HttpResponse(f"Error al generar PDF: {e}", status=500)
 
@@ -79,7 +83,7 @@ def pedido_export_pdf(request):
 @login_required
 def actuaciones_list(request):
     actuaciones = Actuacion.objects.filter(usuario=request.user)
-    return render(request, 'core/actuaciones/actuaciones_list.html', {'actuaciones': actuaciones})
+    return render(request, 'actuaciones/actuaciones_list.html', {'actuaciones': actuaciones})
 
 @login_required
 def actuacion_nueva(request):
@@ -96,7 +100,7 @@ def actuacion_nueva(request):
             return redirect('actuaciones_list')
     else:
         form = ActuacionForm(request=request)
-    return render(request, 'core/actuaciones/actuacion_form.html', {'form': form})
+    return render(request, 'actuaciones/actuacion_form.html', {'form': form})
 
 @login_required
 def actuacion_editar(request, pk):
@@ -108,7 +112,7 @@ def actuacion_editar(request, pk):
             return redirect('actuaciones_list')
     else:
         form = ActuacionForm(instance=actuacion, request=request)
-    return render(request, 'core/actuaciones/actuacion_form.html', {'form': form})
+    return render(request, 'actuaciones/actuacion_form.html', {'form': form})
 
 @login_required
 def actuacion_eliminar(request, pk):
@@ -116,7 +120,7 @@ def actuacion_eliminar(request, pk):
     if request.method == 'POST':
         actuacion.delete()
         return redirect('actuaciones_list')
-    return render(request, 'core/actuaciones/actuacion_confirm_delete.html', {'actuacion': actuacion})
+    return render(request, 'actuaciones/actuacion_confirm_delete.html', {'actuacion': actuacion})
 
 @login_required
 def actuaciones_export_csv(request):
@@ -133,7 +137,7 @@ def actuaciones_export_csv(request):
 def facturas_list(request):
     facturas = Factura.objects.filter(usuario=request.user)
     return render(
-        request, "core/facturas/facturas_list.html", {"facturas": facturas}
+        request, "facturas/facturas_list.html", {"facturas": facturas}
     )
 
 
@@ -157,7 +161,7 @@ def factura_nueva(request):
             return redirect("facturas_list")
     else:
         form = FacturaForm(request=request)
-    return render(request, "core/facturas/factura_form.html", {"form": form})
+    return render(request, "facturas/factura_form.html", {"form": form})
 
 
 @login_required
@@ -170,7 +174,7 @@ def factura_editar(request, pk):
             return redirect("facturas_list")
     else:
         form = FacturaForm(instance=factura, request=request)
-    return render(request, "core/facturas/factura_form.html", {"form": form})
+    return render(request, "facturas/factura_form.html", {"form": form})
 
 
 @login_required
@@ -192,7 +196,7 @@ def factura_export_csv(request):
 def factura_export_html(request):
     facturas = Factura.objects.filter(usuario=request.user)
     html = render_to_string(
-        "core/facturas/facturas_export.html", {"facturas": facturas}
+        "facturas/facturas_export.html", {"facturas": facturas}
     )
     response = HttpResponse(html, content_type="text/html")
     response["Content-Disposition"] = 'attachment; filename="facturas.html"'

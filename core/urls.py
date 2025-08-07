@@ -2,28 +2,5 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Dashboard
     path('', views.dashboard, name='dashboard'),
-
-    # Pedidos
-    path('pedidos/', views.pedidos_list, name='pedidos_list'),
-    path('pedidos/nuevo/', views.pedido_nuevo, name='pedido_nuevo'),
-    path('pedidos/editar/<int:pk>/', views.pedido_editar, name='pedido_editar'),
-    path('pedidos/export/csv/', views.pedido_export_csv, name='pedido_export_csv'),
-    path('pedidos/export/pdf/', views.pedido_export_pdf, name='pedido_export_pdf'),
-
-    # Actuaciones
-    path('actuaciones/', views.actuaciones_list, name='actuaciones_list'),
-    path('actuaciones/nueva/', views.actuacion_nueva, name='actuacion_nueva'),
-    path('actuaciones/editar/<int:pk>/', views.actuacion_editar, name='actuacion_editar'),
-    path('actuaciones/eliminar/<int:pk>/', views.actuacion_eliminar, name='actuacion_eliminar'),
-    path('actuaciones/export/csv/', views.actuaciones_export_csv, name='actuaciones_export_csv'),
-
-    # Facturas
-    path('facturas/', views.facturas_list, name='facturas_list'),
-    path('facturas/nueva/', views.factura_nueva, name='factura_nueva'),
-    path('facturas/editar/<int:pk>/', views.factura_editar, name='factura_editar'),
-    path('facturas/export/csv/', views.factura_export_csv, name='factura_export_csv'),
-    path('facturas/export/html/', views.factura_export_html, name='factura_export_html'),
-    path('facturas/export/pdf/', views.factura_export_pdf, name='factura_export_pdf'),
 ]

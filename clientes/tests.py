@@ -1,7 +1,7 @@
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from core.models import Cliente
+from .models import Cliente
 
 
 @override_settings(ROOT_URLCONF="test_urls")

@@ -3,7 +3,10 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from unittest.mock import patch
 
-from .models import Cliente, Pedido, Factura, Actuacion
+from clientes.models import Cliente
+from pedidos.models import Pedido
+from facturas.models import Factura
+from actuaciones.models import Actuacion
 from .utils import export_csv
 
 
@@ -229,9 +232,9 @@ class ActuacionCRUDTests(TestCase):
                     (
                         "django.template.loaders.locmem.Loader",
                         {
-                            "core/pedidos/pedidos_list.html": "{% for p in pedidos %}{{ p.descripcion }}{% endfor %}",
-                            "core/actuaciones/actuaciones_list.html": "{% for a in actuaciones %}{{ a.descripcion }}{% endfor %}",
-                            "core/facturas/facturas_list.html": "{% for f in facturas %}{{ f.numero }}{% endfor %}",
+                            "pedidos/pedidos_list.html": "{% for p in pedidos %}{{ p.descripcion }}{% endfor %}",
+                            "actuaciones/actuaciones_list.html": "{% for a in actuaciones %}{{ a.descripcion }}{% endfor %}",
+                            "facturas/facturas_list.html": "{% for f in facturas %}{{ f.numero }}{% endfor %}",
                         },
                     )
                 ]
@@ -349,7 +352,7 @@ class AccessControlTests(TestCase):
     def test_pedido_cross_access_forbidden(self):
         self.client.force_login(self.user1)
         with patch(
-            "core.forms.Cliente.objects.filter",
+            "clientes.forms.Cliente.objects.filter",
             return_value=Cliente.objects.all(),
         ):
             response = self.client.post(
@@ -368,10 +371,10 @@ class AccessControlTests(TestCase):
     def test_actuacion_cross_access_forbidden(self):
         self.client.force_login(self.user1)
         with patch(
-            "core.forms.Cliente.objects.filter",
+            "clientes.forms.Cliente.objects.filter",
             return_value=Cliente.objects.all(),
         ), patch(
-            "core.forms.Pedido.objects.filter",
+            "pedidos.forms.Pedido.objects.filter",
             return_value=Pedido.objects.all(),
         ):
             response = self.client.post(
@@ -390,13 +393,13 @@ class AccessControlTests(TestCase):
     def test_factura_cross_access_forbidden(self):
         self.client.force_login(self.user1)
         with patch(
-            "core.forms.Cliente.objects.filter",
+            "clientes.forms.Cliente.objects.filter",
             return_value=Cliente.objects.all(),
         ), patch(
-            "core.forms.Pedido.objects.filter",
+            "pedidos.forms.Pedido.objects.filter",
             return_value=Pedido.objects.all(),
         ), patch(
-            "core.forms.Actuacion.objects.filter",
+            "actuaciones.forms.Actuacion.objects.filter",
             return_value=Actuacion.objects.all(),
         ):
             response = self.client.post(
