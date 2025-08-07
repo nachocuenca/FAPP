@@ -30,6 +30,9 @@ class Cliente(models.Model):
     telefono = models.CharField(max_length=20, blank=True, null=True)
     activo = models.BooleanField(default=True)
 
+    class Meta:
+        indexes = [models.Index(fields=["usuario"])]
+
     def __str__(self) -> str:  # pragma: no cover - string representation
         return self.nombre
 
@@ -69,6 +72,9 @@ class Pedido(models.Model):
     fecha = models.DateField()
     descripcion = models.CharField(max_length=255)
     total = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        indexes = [models.Index(fields=["usuario"])]
 
     def __str__(self) -> str:  # pragma: no cover - string representation
         return f"Pedido #{self.pk} - {self.cliente.nombre}"
@@ -117,6 +123,9 @@ class Factura(models.Model):
         ],
         default="borrador",
     )
+
+    class Meta:
+        indexes = [models.Index(fields=["usuario"])]
 
     def save(self, *args, **kwargs) -> None:
         iva_amount = self.base_imponible * self.iva / Decimal("100")
