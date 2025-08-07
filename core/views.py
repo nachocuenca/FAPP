@@ -22,32 +22,40 @@ def dashboard(request):
 @login_required
 def clientes_list(request):
     clientes = Cliente.objects.all()
-    return render(request, 'core/clientes/clientes_list.html', {'clientes': clientes})
+    return render(request, 'core/clientes_list.html', {"clientes": clientes})
 
 @login_required
 def cliente_nuevo(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ClienteForm(request.POST)
         if form.is_valid():
             cliente = form.save(commit=False)
             cliente.usuario = request.user
             cliente.save()
-            return redirect('clientes_list')
+            return redirect("clientes_list")
     else:
         form = ClienteForm()
-    return render(request, 'core/clientes/cliente_form.html', {'form': form})
+    return render(
+        request,
+        "core/cliente_form.html",
+        {"form": form, "modo": "nuevo"},
+    )
 
 @login_required
 def cliente_editar(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
             form.save()
-            return redirect('clientes_list')
+            return redirect("clientes_list")
     else:
         form = ClienteForm(instance=cliente)
-    return render(request, 'core/clientes/cliente_form.html', {'form': form})
+    return render(
+        request,
+        "core/cliente_form.html",
+        {"form": form, "modo": "editar"},
+    )
 
 @login_required
 def cliente_export_csv(request):
