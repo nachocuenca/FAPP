@@ -5,14 +5,6 @@ urlpatterns = [
     # Dashboard
     path('', views.dashboard, name='dashboard'),
 
-    # Clientes
-    path('clientes/', views.clientes_list, name='clientes_list'),
-    path('clientes/nuevo/', views.cliente_nuevo, name='cliente_nuevo'),
-    path('clientes/editar/<int:pk>/', views.cliente_editar, name='cliente_editar'),
-    path('clientes/export/csv/', views.cliente_export_csv, name='cliente_export_csv'),
-    path('clientes/export/pdf/', views.cliente_export_pdf, name='cliente_export_pdf'),
-    path('clientes/print/html/', views.cliente_print_html, name='cliente_print_html'),
-
     # Pedidos
     path('pedidos/', views.pedidos_list, name='pedidos_list'),
     path('pedidos/nuevo/', views.pedido_nuevo, name='pedido_nuevo'),
