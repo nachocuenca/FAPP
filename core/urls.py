@@ -24,6 +24,8 @@ urlpatterns = [
     path('actuaciones/', views.actuaciones_list, name='actuaciones_list'),
     path('actuaciones/nueva/', views.actuacion_nueva, name='actuacion_nueva'),
     path('actuaciones/editar/<int:pk>/', views.actuacion_editar, name='actuacion_editar'),
+    path('actuaciones/eliminar/<int:pk>/', views.actuacion_eliminar, name='actuacion_eliminar'),
+    path('actuaciones/export/csv/', views.actuaciones_export_csv, name='actuaciones_export_csv'),
 
     # Facturas
     path('facturas/', views.facturas_list, name='facturas_list'),

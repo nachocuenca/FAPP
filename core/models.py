@@ -43,15 +43,13 @@ class Pedido(models.Model):
 # Actuación (servicio realizado)
 # --------------------------
 class Actuacion(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    pedido = models.ForeignKey(Pedido, on_delete=models.SET_NULL, null=True, blank=True)
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='actuaciones')
     fecha = models.DateField()
     descripcion = models.TextField()
-    total = models.DecimalField(max_digits=10, decimal_places=2)
+    coste = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f'Actuación #{self.pk} - {self.cliente.nombre}'
+        return f'Actuación de Pedido #{self.pedido.pk}'
 
 # --------------------------
 # Factura
