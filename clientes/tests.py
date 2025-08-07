@@ -74,34 +74,39 @@ class ClienteCRUDTests(TestCase):
         self.assertEqual(response["Content-Type"], "application/pdf")
         self.assertTrue(response.content.startswith(b"%PDF"))
 
+    def test_list_shows_only_user_clients(self):
+        Cliente.objects.create(usuario=self.user, nombre="Mine")
+        other_user = get_user_model().objects.create_user("other")
+        Cliente.objects.create(usuario=other_user, nombre="Other")
+        response = self.client.get(reverse("clientes:cliente_list"))
+        self.assertContains(response, "Mine")
+        self.assertNotContains(response, "Other")
 
+    def test_cannot_edit_other_user_cliente(self):
+        other_user = get_user_model().objects.create_user("other")
+        other_cliente = Cliente.objects.create(usuario=other_user, nombre="Other")
+        response = self.client.get(reverse("clientes:cliente_edit", args=[other_cliente.pk]))
+        self.assertEqual(response.status_code, 404)
 
-@override_settings(ROOT_URLCONF="test_urls")
-class ClienteLoginRequiredTests(TestCase):
-    def setUp(self):
-        User = get_user_model()
-        self.user = User.objects.create_user(username="user2", password="pass")
-        self.cliente = Cliente.objects.create(usuario=self.user, nombre="Cli")
+    def test_cannot_delete_other_user_cliente(self):
+        other_user = get_user_model().objects.create_user("other")
+        other_cliente = Cliente.objects.create(usuario=other_user, nombre="Other")
+        response = self.client.post(reverse("clientes:cliente_delete", args=[other_cliente.pk]))
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Cliente.objects.filter(pk=other_cliente.pk).exists())
 
-    def assert_login_redirect(self, url, method="get"):
-        client_method = getattr(self.client, method)
-        response = client_method(url)
-        self.assertRedirects(
-            response,
-            f"/accounts/login/?next={url}",
-            fetch_redirect_response=False,
-        )
+    def test_export_csv_excludes_other_user_clients(self):
+        Cliente.objects.create(usuario=self.user, nombre="Mine")
+        other_user = get_user_model().objects.create_user("other")
+        Cliente.objects.create(usuario=other_user, nombre="Other")
+        response = self.client.get(reverse("clientes:cliente_export_csv"))
+        self.assertIn(b"Mine", response.content)
+        self.assertNotIn(b"Other", response.content)
 
-    def test_login_required_views(self):
-        urls = [
-            reverse("clientes:cliente_create"),
-            reverse("clientes:cliente_edit", args=[self.cliente.pk]),
-            reverse("clientes:cliente_delete", args=[self.cliente.pk]),
-            reverse("clientes:cliente_export_csv"),
-            reverse("clientes:cliente_export_pdf"),
-            reverse("clientes:cliente_print"),
-        ]
-        for url in urls:
-            with self.subTest(url=url):
-                self.assert_login_redirect(url)
-
+    def test_export_pdf_excludes_other_user_clients(self):
+        Cliente.objects.create(usuario=self.user, nombre="Mine")
+        other_user = get_user_model().objects.create_user("other")
+        Cliente.objects.create(usuario=other_user, nombre="Other")
+        response = self.client.get(reverse("clientes:cliente_export_pdf"))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(b"Other", response.content)

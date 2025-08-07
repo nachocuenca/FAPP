@@ -30,7 +30,7 @@ def cliente_create(request):
 
 @login_required
 def cliente_edit(request, pk):
-    cliente = get_object_or_404(Cliente, pk=pk)
+    cliente = get_object_or_404(Cliente, pk=pk, usuario=request.user)
     if request.method == 'POST':
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
@@ -45,7 +45,7 @@ def cliente_edit(request, pk):
 
 @login_required
 def cliente_delete(request, pk):
-    cliente = get_object_or_404(Cliente, pk=pk)
+    cliente = get_object_or_404(Cliente, pk=pk, usuario=request.user)
     if request.method == 'POST':
         cliente.delete()
         return redirect('clientes:cliente_list')
