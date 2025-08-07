@@ -43,38 +43,40 @@ class PresupuestoForm(forms.ModelForm):
 class PedidoForm(forms.ModelForm):
     class Meta:
         model = Pedido
-        fields = ['cliente', 'fecha', 'descripcion', 'estado']
+        fields = ['cliente', 'presupuesto', 'fecha', 'descripcion', 'total']
         labels = {
             'cliente': 'Cliente',
+            'presupuesto': 'Presupuesto',
             'fecha': 'Fecha',
             'descripcion': 'Descripción',
-            'estado': 'Estado',
+            'total': 'Total',
         }
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-select'}),
+            'presupuesto': forms.Select(attrs={'class': 'form-select'}),
             'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'estado': forms.Select(attrs={'class': 'form-select'}),
+            'total': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
 
 class ActuacionForm(forms.ModelForm):
     class Meta:
         model = Actuacion
-        fields = ['cliente', 'fecha', 'descripcion', 'tecnico', 'estado']
+        fields = ['cliente', 'pedido', 'fecha', 'descripcion', 'total']
         labels = {
             'cliente': 'Cliente',
+            'pedido': 'Pedido',
             'fecha': 'Fecha',
             'descripcion': 'Descripción del servicio',
-            'tecnico': 'Técnico asignado',
-            'estado': 'Estado',
+            'total': 'Total',
         }
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-select'}),
+            'pedido': forms.Select(attrs={'class': 'form-select'}),
             'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'tecnico': forms.TextInput(attrs={'class': 'form-control'}),
-            'estado': forms.Select(attrs={'class': 'form-select'}),
+            'total': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
 
