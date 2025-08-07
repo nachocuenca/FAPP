@@ -2,6 +2,7 @@ from decimal import Decimal
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 
 # --------------------------
 # Usuario personalizado
@@ -24,7 +25,12 @@ class Cliente(models.Model):
         related_name="clientes",
     )
     nombre = models.CharField(max_length=100)
-    cif = models.CharField(max_length=20, blank=True, null=True, unique=True)
+    cif = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        validators=[RegexValidator(r'^[A-Z0-9]{1,20}$', 'CIF inválido')],
+    )
     direccion = models.CharField(max_length=200, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     telefono = models.CharField(max_length=20, blank=True, null=True)
@@ -32,6 +38,13 @@ class Cliente(models.Model):
 
     class Meta:
         indexes = [models.Index(fields=["usuario"])]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['cif'],
+                condition=~models.Q(cif__isnull=True) & ~models.Q(cif=''),
+                name='unique_cif_nonblank'
+            )
+        ]
 
     def __str__(self) -> str:  # pragma: no cover - string representation
         return self.nombre
