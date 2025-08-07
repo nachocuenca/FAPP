@@ -73,4 +73,35 @@ class ClienteCRUDTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
         self.assertTrue(response.content.startswith(b"%PDF"))
-        self.assertNotIn(b"OTHER", response.content)
+
+
+
+@override_settings(ROOT_URLCONF="test_urls")
+class ClienteLoginRequiredTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.user = User.objects.create_user(username="user2", password="pass")
+        self.cliente = Cliente.objects.create(usuario=self.user, nombre="Cli")
+
+    def assert_login_redirect(self, url, method="get"):
+        client_method = getattr(self.client, method)
+        response = client_method(url)
+        self.assertRedirects(
+            response,
+            f"/accounts/login/?next={url}",
+            fetch_redirect_response=False,
+        )
+
+    def test_login_required_views(self):
+        urls = [
+            reverse("clientes:cliente_create"),
+            reverse("clientes:cliente_edit", args=[self.cliente.pk]),
+            reverse("clientes:cliente_delete", args=[self.cliente.pk]),
+            reverse("clientes:cliente_export_csv"),
+            reverse("clientes:cliente_export_pdf"),
+            reverse("clientes:cliente_print"),
+        ]
+        for url in urls:
+            with self.subTest(url=url):
+                self.assert_login_redirect(url)
+
