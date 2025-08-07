@@ -2,14 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from .models import Cliente, Pedido, Actuacion, Factura
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-import csv
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
 from .forms import ClienteForm, PedidoForm, ActuacionForm, FacturaForm
-from django.template.loader import get_template
-from xhtml2pdf import pisa
 from .utils import export_csv, export_pdf, render_html
 
 
@@ -57,14 +50,20 @@ def cliente_export_csv(request):
         ('email', 'Email'),
         ('telefono', 'Teléfono'),
     ]
-    return export_csv(queryset, fields, 'clientes.csv')
+    try:
+        return export_csv(queryset, fields, 'clientes.csv')
+    except Exception as e:
+        return HttpResponse(f"Error al generar CSV: {e}", status=500)
 
 
 @login_required
 def cliente_export_pdf(request):
     clientes = Cliente.objects.all()
     context = {'clientes': clientes}
-    return export_pdf('core/clientes_pdf.html', context, 'clientes.pdf')
+    try:
+        return export_pdf('core/clientes_pdf.html', context, 'clientes.pdf')
+    except Exception as e:
+        return HttpResponse(f"Error al generar PDF: {e}", status=500)
 
 
 @login_required
@@ -105,23 +104,26 @@ def pedido_editar(request, pk):
 
 @login_required
 def pedido_export_csv(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="pedidos.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['Fecha', 'Cliente', 'Presupuesto', 'Total'])
-    for p in Pedido.objects.all():
-        writer.writerow([p.fecha, p.cliente.nombre, p.presupuesto.id if p.presupuesto else '', p.total])
-    return response
+    queryset = Pedido.objects.all()
+    fields = [
+        ('fecha', 'Fecha'),
+        ('cliente', 'Cliente'),
+        ('presupuesto_id', 'Presupuesto'),
+        ('total', 'Total'),
+    ]
+    try:
+        return export_csv(queryset, fields, 'pedidos.csv')
+    except Exception as e:
+        return HttpResponse(f"Error al generar CSV: {e}", status=500)
 
 @login_required
 def pedido_export_pdf(request):
     pedidos = Pedido.objects.all()
-    template = get_template('core/pedidos/pedidos_pdf.html')
-    html = template.render({'pedidos': pedidos})
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="pedidos.pdf"'
-    pisa.CreatePDF(html, dest=response)
-    return response
+    context = {'pedidos': pedidos}
+    try:
+        return export_pdf('core/pedidos/pedidos_pdf.html', context, 'pedidos.pdf')
+    except Exception as e:
+        return HttpResponse(f"Error al generar PDF: {e}", status=500)
 
 
 # --- Actuaciones ---
@@ -165,13 +167,17 @@ def actuacion_eliminar(request, pk):
 
 @login_required
 def actuaciones_export_csv(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="actuaciones.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['Pedido', 'Fecha', 'Descripción', 'Coste'])
-    for act in Actuacion.objects.all():
-        writer.writerow([act.pedido.id, act.fecha, act.descripcion, act.coste])
-    return response
+    queryset = Actuacion.objects.all()
+    fields = [
+        ('pedido_id', 'Pedido'),
+        ('fecha', 'Fecha'),
+        ('descripcion', 'Descripción'),
+        ('coste', 'Coste'),
+    ]
+    try:
+        return export_csv(queryset, fields, 'actuaciones.csv')
+    except Exception as e:
+        return HttpResponse(f"Error al generar CSV: {e}", status=500)
 
 # --- Facturas ---
 @login_required
@@ -211,43 +217,35 @@ def factura_editar(request, pk):
 
 @login_required
 def factura_export_csv(request):
-    response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = 'attachment; filename="facturas.csv"'
-    writer = csv.writer(response)
-    writer.writerow(["Número", "Cliente", "Total"])
-    for factura in Factura.objects.all():
-        writer.writerow([factura.numero, factura.cliente.nombre, factura.total])
-    return response
+    queryset = Factura.objects.all()
+    fields = [
+        ('numero', 'Número'),
+        ('cliente', 'Cliente'),
+        ('total', 'Total'),
+    ]
+    try:
+        return export_csv(queryset, fields, 'facturas.csv')
+    except Exception as e:
+        return HttpResponse(f"Error al generar CSV: {e}", status=500)
 
 
 @login_required
 def factura_export_html(request):
     facturas = Factura.objects.all()
-    html = render_to_string(
-        "core/facturas/facturas_export.html", {"facturas": facturas}
-    )
-    response = HttpResponse(html, content_type="text/html")
-    response["Content-Disposition"] = 'attachment; filename="facturas.html"'
-    return response
+    context = {"facturas": facturas}
+    try:
+        response = render_html("core/facturas/facturas_export.html", context)
+        response["Content-Disposition"] = 'attachment; filename="facturas.html"'
+        return response
+    except Exception as e:
+        return HttpResponse(f"Error al generar HTML: {e}", status=500)
 
 
 @login_required
 def factura_export_pdf(request):
-    response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = 'attachment; filename="facturas.pdf"'
-    p = canvas.Canvas(response, pagesize=letter)
-    y = 770
-    p.drawString(80, 800, "Listado de facturas")
-    for factura in Factura.objects.all():
-        p.drawString(
-            80,
-            y,
-            f"{factura.numero} - {factura.cliente.nombre} - {factura.total}",
-        )
-        y -= 20
-        if y < 50:
-            p.showPage()
-            y = 770
-    p.showPage()
-    p.save()
-    return response
+    facturas = Factura.objects.all()
+    context = {"facturas": facturas}
+    try:
+        return export_pdf("core/facturas/facturas_export.html", context, "facturas.pdf")
+    except Exception as e:
+        return HttpResponse(f"Error al generar PDF: {e}", status=500)
