@@ -8,6 +8,7 @@ urlpatterns = [
     path('', include('core.urls')),
     path('presupuestos/', include('presupuestos.urls')),
     path('clientes/', include(('clientes.urls', 'clientes'), namespace='clientes')),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
 
 if settings.DEBUG:

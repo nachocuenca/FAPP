@@ -3,16 +3,18 @@ import csv
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from reportlab.pdfgen import canvas
+from django.contrib.auth.decorators import login_required
 
 from .forms import ClienteForm
 from core.models import Cliente
 
-
+@login_required
 def cliente_list(request):
     clientes = Cliente.objects.all()
     return render(request, 'clientes/cliente_list.html', {'clientes': clientes})
 
 
+@login_required
 def cliente_create(request):
     if request.method == 'POST':
         form = ClienteForm(request.POST)
@@ -26,6 +28,7 @@ def cliente_create(request):
     return render(request, 'clientes/cliente_form.html', {'form': form})
 
 
+@login_required
 def cliente_edit(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
     if request.method == 'POST':
@@ -40,6 +43,7 @@ def cliente_edit(request, pk):
     return render(request, 'clientes/cliente_form.html', {'form': form})
 
 
+@login_required
 def cliente_delete(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
     if request.method == 'POST':
@@ -48,6 +52,7 @@ def cliente_delete(request, pk):
     return render(request, 'clientes/cliente_confirm_delete.html', {'cliente': cliente})
 
 
+@login_required
 def cliente_export_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="clientes.csv"'
@@ -58,6 +63,7 @@ def cliente_export_csv(request):
     return response
 
 
+@login_required
 def cliente_export_pdf(request):
     buffer = BytesIO()
     p = canvas.Canvas(buffer)
@@ -74,6 +80,7 @@ def cliente_export_pdf(request):
     return HttpResponse(buffer, content_type='application/pdf')
 
 
+@login_required
 def cliente_print(request):
     clientes = Cliente.objects.all()
     return render(request, 'clientes/clientes_print.html', {'clientes': clientes})
