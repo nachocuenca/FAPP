@@ -9,7 +9,7 @@ from .forms import PresupuestoForm
 
 @login_required
 def presupuesto_list(request):
-    presupuestos = Presupuesto.objects.all()
+    presupuestos = Presupuesto.objects.filter(usuario=request.user)
     return render(request, 'presupuestos/presupuesto_list.html', {'presupuestos': presupuestos})
 
 @login_required
@@ -24,7 +24,7 @@ def presupuesto_create(request):
 
 @login_required
 def presupuesto_update(request, pk):
-    presupuesto = get_object_or_404(Presupuesto, pk=pk)
+    presupuesto = get_object_or_404(Presupuesto, pk=pk, usuario=request.user)
     form = PresupuestoForm(request.POST or None, instance=presupuesto, request=request)
     if form.is_valid():
         presupuesto = form.save(commit=False)
@@ -35,7 +35,7 @@ def presupuesto_update(request, pk):
 
 @login_required
 def presupuesto_delete(request, pk):
-    presupuesto = get_object_or_404(Presupuesto, pk=pk)
+    presupuesto = get_object_or_404(Presupuesto, pk=pk, usuario=request.user)
     if request.method == 'POST':
         presupuesto.delete()
         return redirect('presupuesto_list')
@@ -47,13 +47,13 @@ def presupuesto_export_csv(request):
     response['Content-Disposition'] = 'attachment; filename="presupuestos.csv"'
     writer = csv.writer(response)
     writer.writerow(['Fecha', 'Cliente', 'Total'])
-    for p in Presupuesto.objects.all():
+    for p in Presupuesto.objects.filter(usuario=request.user):
         writer.writerow([p.fecha, p.cliente.nombre, p.total])
     return response
 
 @login_required
 def presupuesto_export_pdf(request):
-    presupuestos = Presupuesto.objects.all()
+    presupuestos = Presupuesto.objects.filter(usuario=request.user)
     template = get_template('presupuestos/presupuestos_pdf.html')
     html = template.render({'presupuestos': presupuestos})
     response = HttpResponse(content_type='application/pdf')
@@ -63,7 +63,7 @@ def presupuesto_export_pdf(request):
 
 @login_required
 def presupuesto_export_html(request):
-    presupuestos = Presupuesto.objects.all()
+    presupuestos = Presupuesto.objects.filter(usuario=request.user)
     template = get_template('presupuestos/presupuesto_list.html')
     html = template.render({'presupuestos': presupuestos})
     response = HttpResponse(html, content_type='text/html')
