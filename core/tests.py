@@ -1,7 +1,10 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from types import SimpleNamespace
+
 from .models import Cliente, Pedido, Factura, Actuacion
+from .utils import export_csv
 
 
 class FacturaTests(TestCase):
@@ -196,3 +199,17 @@ class ActuacionCRUDTests(TestCase):
         response = self.client.get(reverse("actuaciones_export_csv"))
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Export", response.content)
+
+
+class UtilsExportCsvTests(TestCase):
+    def test_missing_field_logs_and_blanks(self):
+        obj = SimpleNamespace(name="Foo")
+        queryset = [obj]
+        fields = ["name", "missing"]
+        with self.assertLogs("core.utils", level="ERROR") as cm:
+            response = export_csv(queryset, fields)
+        content = response.content.decode().splitlines()
+        self.assertEqual(content[0], "name,missing")
+        self.assertEqual(content[1], "Foo,")
+        self.assertEqual(len(cm.output), 1)
+        self.assertIn("missing", cm.output[0])
