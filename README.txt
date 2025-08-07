@@ -18,6 +18,18 @@ Configuración del entorno
    ```
 
 
+Variables de entorno
+--------------------
+
+Antes de ejecutar el proyecto, define las siguientes variables de entorno:
+
+```bash
+export SECRET_KEY='tu-clave-secreta'
+export DEBUG='False'  # o 'True' en desarrollo
+export ALLOWED_HOSTS='localhost,127.0.0.1'
+```
+
+
 Dependencias
 ------------
 
