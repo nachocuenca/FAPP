@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from .models import Cliente, Pedido, Actuacion, Factura
 from django.template.loader import get_template, render_to_string
 import csv
@@ -96,6 +96,12 @@ def pedido_nuevo(request):
         form = PedidoForm(request.POST, request=request)
         if form.is_valid():
             pedido = form.save(commit=False)
+            cliente = form.cleaned_data["cliente"]
+            if cliente.usuario != request.user:
+                return HttpResponseForbidden()
+            presupuesto = form.cleaned_data.get("presupuesto")
+            if presupuesto and presupuesto.usuario != request.user:
+                return HttpResponseForbidden()
             pedido.usuario = request.user
             pedido.save()
             return redirect('pedidos_list')
@@ -151,6 +157,10 @@ def actuacion_nueva(request):
         form = ActuacionForm(request.POST, request=request)
         if form.is_valid():
             actuacion = form.save(commit=False)
+            cliente = form.cleaned_data["cliente"]
+            pedido = form.cleaned_data["pedido"]
+            if cliente.usuario != request.user or pedido.usuario != request.user:
+                return HttpResponseForbidden()
             actuacion.usuario = request.user
             actuacion.save()
             return redirect('actuaciones_list')
@@ -203,6 +213,15 @@ def factura_nueva(request):
         form = FacturaForm(request.POST, request=request)
         if form.is_valid():
             factura = form.save(commit=False)
+            cliente = form.cleaned_data["cliente"]
+            pedido = form.cleaned_data.get("pedido")
+            actuacion = form.cleaned_data.get("actuacion")
+            if cliente.usuario != request.user:
+                return HttpResponseForbidden()
+            if pedido and pedido.usuario != request.user:
+                return HttpResponseForbidden()
+            if actuacion and actuacion.usuario != request.user:
+                return HttpResponseForbidden()
             factura.usuario = request.user
             factura.save()
             return redirect("facturas_list")
