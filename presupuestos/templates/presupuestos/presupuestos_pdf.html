@@ -12,26 +12,22 @@
 <body>
   <h2>Listado de presupuestos</h2>
   <table>
-    <thead>
-      <tr>
-        <th>Fecha</th>
-        <th>Número</th>
-        <th>Cliente</th>
-        <th>Total</th>
-        <th>Estado</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for p in presupuestos %}
-      <tr>
-        <td>{{ p.fecha }}</td>
-        <td>{{ p.numero }}</td>
-        <td>{{ p.cliente.nombre }}</td>
-        <td>{{ p.total }}</td>
-        <td>{{ p.get_estado_display }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in presupuestos %}
+        <tr>
+          <td>{{ p.fecha }}</td>
+          <td>{{ p.cliente.nombre }}</td>
+          <td>{{ p.total }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
   </table>
 </body>
 </html>
