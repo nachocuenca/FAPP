@@ -2,9 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from .models import Cliente, Pedido, Actuacion, Factura
+from django.template.loader import get_template, render_to_string
+import csv
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 from .forms import ClienteForm, PedidoForm, ActuacionForm, FacturaForm
+from xhtml2pdf import pisa
 from .utils import export_csv, export_pdf, render_html
-
 
 
 @login_required
@@ -14,37 +18,46 @@ def dashboard(request):
 # --- Clientes ---
 @login_required
 def clientes_list(request):
-    clientes = Cliente.objects.all()
+    clientes = Cliente.objects.filter(usuario=request.user)
     return render(request, 'core/clientes/clientes_list.html', {'clientes': clientes})
 
 @login_required
 def cliente_nuevo(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ClienteForm(request.POST)
         if form.is_valid():
             cliente = form.save(commit=False)
             cliente.usuario = request.user
             cliente.save()
-            return redirect('clientes_list')
+            return redirect("clientes_list")
     else:
         form = ClienteForm()
-    return render(request, 'core/clientes/cliente_form.html', {'form': form})
+    return render(
+        request,
+        "core/cliente_form.html",
+        {"form": form, "modo": "nuevo"},
+    )
 
 @login_required
 def cliente_editar(request, pk):
-    cliente = get_object_or_404(Cliente, pk=pk)
+
+    cliente = get_object_or_404(Cliente, pk=pk, usuario=request.user)
     if request.method == 'POST':
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
             form.save()
-            return redirect('clientes_list')
+            return redirect("clientes_list")
     else:
         form = ClienteForm(instance=cliente)
-    return render(request, 'core/clientes/cliente_form.html', {'form': form})
+    return render(
+        request,
+        "core/cliente_form.html",
+        {"form": form, "modo": "editar"},
+    )
 
 @login_required
 def cliente_export_csv(request):
-    queryset = Cliente.objects.all()
+    queryset = Cliente.objects.filter(usuario=request.user)
     fields = [
         ('nombre', 'Nombre'),
         ('email', 'Email'),
@@ -58,7 +71,7 @@ def cliente_export_csv(request):
 
 @login_required
 def cliente_export_pdf(request):
-    clientes = Cliente.objects.all()
+    clientes = Cliente.objects.filter(usuario=request.user)
     context = {'clientes': clientes}
     try:
         return export_pdf('core/clientes_pdf.html', context, 'clientes.pdf')
@@ -68,13 +81,13 @@ def cliente_export_pdf(request):
 
 @login_required
 def cliente_print_html(request):
-    clientes = Cliente.objects.all()
+    clientes = Cliente.objects.filter(usuario=request.user)
     context = {'clientes': clientes}
     return render_html('core/clientes_pdf.html', context)
 
 @login_required
 def pedidos_list(request):
-    pedidos = Pedido.objects.all()
+    pedidos = Pedido.objects.filter(usuario=request.user)
     return render(request, 'core/pedidos/pedidos_list.html', {'pedidos': pedidos})
 
 @login_required
@@ -92,7 +105,7 @@ def pedido_nuevo(request):
 
 @login_required
 def pedido_editar(request, pk):
-    pedido = get_object_or_404(Pedido, pk=pk)
+    pedido = get_object_or_404(Pedido, pk=pk, usuario=request.user)
     if request.method == 'POST':
         form = PedidoForm(request.POST, instance=pedido)
         if form.is_valid():
@@ -104,32 +117,30 @@ def pedido_editar(request, pk):
 
 @login_required
 def pedido_export_csv(request):
-    queryset = Pedido.objects.all()
-    fields = [
-        ('fecha', 'Fecha'),
-        ('cliente', 'Cliente'),
-        ('presupuesto_id', 'Presupuesto'),
-        ('total', 'Total'),
-    ]
-    try:
-        return export_csv(queryset, fields, 'pedidos.csv')
-    except Exception as e:
-        return HttpResponse(f"Error al generar CSV: {e}", status=500)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="pedidos.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['Fecha', 'Cliente', 'Presupuesto', 'Total'])
+    for p in Pedido.objects.filter(usuario=request.user):
+        writer.writerow([p.fecha, p.cliente.nombre, p.presupuesto.id if p.presupuesto else '', p.total])
+    return response
 
 @login_required
 def pedido_export_pdf(request):
-    pedidos = Pedido.objects.all()
-    context = {'pedidos': pedidos}
-    try:
-        return export_pdf('core/pedidos/pedidos_pdf.html', context, 'pedidos.pdf')
-    except Exception as e:
-        return HttpResponse(f"Error al generar PDF: {e}", status=500)
+    pedidos = Pedido.objects.filter(usuario=request.user)
+    template = get_template('core/pedidos/pedidos_pdf.html')
+    html = template.render({'pedidos': pedidos})
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="pedidos.pdf"'
+    pisa.CreatePDF(html, dest=response)
+    return response
 
 
 # --- Actuaciones ---
 @login_required
 def actuaciones_list(request):
-    actuaciones = Actuacion.objects.all()
+    actuaciones = Actuacion.objects.filter(usuario=request.user)
     return render(request, 'core/actuaciones/actuaciones_list.html', {'actuaciones': actuaciones})
 
 @login_required
@@ -147,7 +158,7 @@ def actuacion_nueva(request):
 
 @login_required
 def actuacion_editar(request, pk):
-    actuacion = get_object_or_404(Actuacion, pk=pk)
+    actuacion = get_object_or_404(Actuacion, pk=pk, usuario=request.user)
     if request.method == 'POST':
         form = ActuacionForm(request.POST, instance=actuacion)
         if form.is_valid():
@@ -159,7 +170,7 @@ def actuacion_editar(request, pk):
 
 @login_required
 def actuacion_eliminar(request, pk):
-    actuacion = get_object_or_404(Actuacion, pk=pk)
+    actuacion = get_object_or_404(Actuacion, pk=pk, usuario=request.user)
     if request.method == 'POST':
         actuacion.delete()
         return redirect('actuaciones_list')
@@ -167,22 +178,18 @@ def actuacion_eliminar(request, pk):
 
 @login_required
 def actuaciones_export_csv(request):
-    queryset = Actuacion.objects.all()
-    fields = [
-        ('pedido_id', 'Pedido'),
-        ('fecha', 'Fecha'),
-        ('descripcion', 'Descripción'),
-        ('coste', 'Coste'),
-    ]
-    try:
-        return export_csv(queryset, fields, 'actuaciones.csv')
-    except Exception as e:
-        return HttpResponse(f"Error al generar CSV: {e}", status=500)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="actuaciones.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['Pedido', 'Fecha', 'Descripción', 'Coste'])
+    for act in Actuacion.objects.filter(usuario=request.user):
+        writer.writerow([act.pedido.id, act.fecha, act.descripcion, act.coste])
+    return response
 
 # --- Facturas ---
 @login_required
 def facturas_list(request):
-    facturas = Factura.objects.all()
+    facturas = Factura.objects.filter(usuario=request.user)
     return render(
         request, "core/facturas/facturas_list.html", {"facturas": facturas}
     )
@@ -204,7 +211,7 @@ def factura_nueva(request):
 
 @login_required
 def factura_editar(request, pk):
-    factura = get_object_or_404(Factura, pk=pk)
+    factura = get_object_or_404(Factura, pk=pk, usuario=request.user)
     if request.method == "POST":
         form = FacturaForm(request.POST, instance=factura)
         if form.is_valid():
@@ -217,35 +224,46 @@ def factura_editar(request, pk):
 
 @login_required
 def factura_export_csv(request):
-    queryset = Factura.objects.all()
-    fields = [
-        ('numero', 'Número'),
-        ('cliente', 'Cliente'),
-        ('total', 'Total'),
-    ]
-    try:
-        return export_csv(queryset, fields, 'facturas.csv')
-    except Exception as e:
-        return HttpResponse(f"Error al generar CSV: {e}", status=500)
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="facturas.csv"'
+    writer = csv.writer(response)
+    writer.writerow(["Número", "Cliente", "Total"])
+    for factura in Factura.objects.filter(usuario=request.user):
+        writer.writerow([factura.numero, factura.cliente.nombre, factura.total])
+    return response
+
 
 
 @login_required
 def factura_export_html(request):
-    facturas = Factura.objects.all()
-    context = {"facturas": facturas}
-    try:
-        response = render_html("core/facturas/facturas_export.html", context)
-        response["Content-Disposition"] = 'attachment; filename="facturas.html"'
-        return response
-    except Exception as e:
-        return HttpResponse(f"Error al generar HTML: {e}", status=500)
+    facturas = Factura.objects.filter(usuario=request.user)
+    html = render_to_string(
+        "core/facturas/facturas_export.html", {"facturas": facturas}
+    )
+    response = HttpResponse(html, content_type="text/html")
+    response["Content-Disposition"] = 'attachment; filename="facturas.html"'
+    return response
+
 
 
 @login_required
 def factura_export_pdf(request):
-    facturas = Factura.objects.all()
-    context = {"facturas": facturas}
-    try:
-        return export_pdf("core/facturas/facturas_export.html", context, "facturas.pdf")
-    except Exception as e:
-        return HttpResponse(f"Error al generar PDF: {e}", status=500)
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename="facturas.pdf"'
+    p = canvas.Canvas(response, pagesize=letter)
+    y = 770
+    p.drawString(80, 800, "Listado de facturas")
+    for factura in Factura.objects.filter(usuario=request.user):
+        p.drawString(
+            80,
+            y,
+            f"{factura.numero} - {factura.cliente.nombre} - {factura.total}",
+        )
+        y -= 20
+        if y < 50:
+            p.showPage()
+            y = 770
+    p.showPage()
+    p.save()
+    return response
+

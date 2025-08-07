@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from unittest.mock import patch
@@ -216,3 +216,145 @@ class ActuacionCRUDTests(TestCase):
         response = self.client.get(reverse("actuaciones_export_csv"))
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Export", response.content)
+
+
+@override_settings(
+    TEMPLATES=[
+        {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "APP_DIRS": False,
+            "OPTIONS": {
+                "loaders": [
+                    (
+                        "django.template.loaders.locmem.Loader",
+                        {
+                            "core/clientes/clientes_list.html": "{% for c in clientes %}{{ c.nombre }}{% endfor %}",
+                            "core/pedidos/pedidos_list.html": "{% for p in pedidos %}{{ p.descripcion }}{% endfor %}",
+                            "core/actuaciones/actuaciones_list.html": "{% for a in actuaciones %}{{ a.descripcion }}{% endfor %}",
+                            "core/facturas/facturas_list.html": "{% for f in facturas %}{{ f.numero }}{% endfor %}",
+                        },
+                    )
+                ]
+            },
+        }
+    ]
+)
+class AccessControlTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.user1 = User.objects.create_user(username="user1", password="pass")
+        self.user2 = User.objects.create_user(username="user2", password="pass")
+
+        self.cliente1 = Cliente.objects.create(usuario=self.user1, nombre="Cliente1")
+        self.cliente2 = Cliente.objects.create(usuario=self.user2, nombre="Cliente2")
+
+        self.pedido1 = Pedido.objects.create(
+            usuario=self.user1,
+            cliente=self.cliente1,
+            fecha="2024-01-01",
+            descripcion="Pedido1",
+            total=100,
+        )
+        self.pedido2 = Pedido.objects.create(
+            usuario=self.user2,
+            cliente=self.cliente2,
+            fecha="2024-01-01",
+            descripcion="Pedido2",
+            total=200,
+        )
+
+        self.actuacion1 = Actuacion.objects.create(
+            usuario=self.user1,
+            cliente=self.cliente1,
+            pedido=self.pedido1,
+            fecha="2024-01-02",
+            descripcion="Act1",
+            coste=50,
+        )
+        self.actuacion2 = Actuacion.objects.create(
+            usuario=self.user2,
+            cliente=self.cliente2,
+            pedido=self.pedido2,
+            fecha="2024-01-02",
+            descripcion="Act2",
+            coste=60,
+        )
+
+        self.factura1 = Factura.objects.create(
+            usuario=self.user1,
+            cliente=self.cliente1,
+            pedido=self.pedido1,
+            actuacion=self.actuacion1,
+            fecha="2024-01-03",
+            numero="F1",
+            base_imponible=100,
+            iva=21,
+            irpf=0,
+        )
+        self.factura2 = Factura.objects.create(
+            usuario=self.user2,
+            cliente=self.cliente2,
+            pedido=self.pedido2,
+            actuacion=self.actuacion2,
+            fecha="2024-01-03",
+            numero="F2",
+            base_imponible=100,
+            iva=21,
+            irpf=0,
+        )
+
+    def test_clientes_list_filters_user(self):
+        self.client.force_login(self.user1)
+        response = self.client.get(reverse("clientes_list"))
+        self.assertContains(response, "Cliente1")
+        self.assertNotContains(response, "Cliente2")
+
+    def test_clientes_list_requires_login(self):
+        response = self.client.get(reverse("clientes_list"))
+        self.assertRedirects(
+            response,
+            f"/accounts/login/?next={reverse('clientes_list')}",
+            fetch_redirect_response=False,
+        )
+
+    def test_pedidos_list_filters_user(self):
+        self.client.force_login(self.user1)
+        response = self.client.get(reverse("pedidos_list"))
+        self.assertContains(response, "Pedido1")
+        self.assertNotContains(response, "Pedido2")
+
+    def test_pedidos_list_requires_login(self):
+        response = self.client.get(reverse("pedidos_list"))
+        self.assertRedirects(
+            response,
+            f"/accounts/login/?next={reverse('pedidos_list')}",
+            fetch_redirect_response=False,
+        )
+
+    def test_actuaciones_list_filters_user(self):
+        self.client.force_login(self.user1)
+        response = self.client.get(reverse("actuaciones_list"))
+        self.assertContains(response, "Act1")
+        self.assertNotContains(response, "Act2")
+
+    def test_actuaciones_list_requires_login(self):
+        response = self.client.get(reverse("actuaciones_list"))
+        self.assertRedirects(
+            response,
+            f"/accounts/login/?next={reverse('actuaciones_list')}",
+            fetch_redirect_response=False,
+        )
+
+    def test_facturas_list_filters_user(self):
+        self.client.force_login(self.user1)
+        response = self.client.get(reverse("facturas_list"))
+        self.assertContains(response, "F1")
+        self.assertNotContains(response, "F2")
+
+    def test_facturas_list_requires_login(self):
+        response = self.client.get(reverse("facturas_list"))
+        self.assertRedirects(
+            response,
+            f"/accounts/login/?next={reverse('facturas_list')}",
+            fetch_redirect_response=False,
+        )
