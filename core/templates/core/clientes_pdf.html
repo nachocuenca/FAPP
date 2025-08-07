@@ -18,7 +18,7 @@
         <th>CIF</th>
         <th>Email</th>
         <th>Teléfono</th>
-        <th>Localidad</th>
+        <th>Dirección</th>
         <th>Activo</th>
       </tr>
     </thead>
@@ -29,7 +29,7 @@
         <td>{{ c.cif }}</td>
         <td>{{ c.email }}</td>
         <td>{{ c.telefono }}</td>
-        <td>{{ c.localidad }}</td>
+        <td>{{ c.direccion }}</td>
         <td>{{ c.activo|yesno:"Sí,No" }}</td>
       </tr>
       {% endfor %}
