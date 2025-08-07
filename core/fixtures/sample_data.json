@@ -1,0 +1,55 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "username": "demo",
+      "password": "pbkdf2_sha256$600000$1EDvYdjPoLIWdMAl7KwdRK$InM+GcJfDFQyKLuRxjvWoC77wie2LvNpS9+nXxao02M=",
+      "is_superuser": false,
+      "is_staff": false,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.cliente",
+    "pk": 1,
+    "fields": {
+      "usuario": 1,
+      "nombre": "Cliente Demo",
+      "cif": "",
+      "direccion": "",
+      "email": "",
+      "telefono": "",
+      "activo": true
+    }
+  },
+  {
+    "model": "core.pedido",
+    "pk": 1,
+    "fields": {
+      "usuario": 1,
+      "cliente": 1,
+      "presupuesto": null,
+      "fecha": "2024-01-01",
+      "descripcion": "Pedido demo",
+      "total": "100.00"
+    }
+  },
+  {
+    "model": "core.factura",
+    "pk": 1,
+    "fields": {
+      "usuario": 1,
+      "cliente": 1,
+      "pedido": 1,
+      "actuacion": null,
+      "fecha": "2024-01-02",
+      "numero": "F-001",
+      "base_imponible": "100.00",
+      "iva": "21.00",
+      "irpf": "0.00",
+      "total": "121.00",
+      "estado": "borrador"
+    }
+  }
+]

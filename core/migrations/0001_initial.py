@@ -1,3 +1,4 @@
+
 import django.contrib.auth.models
 import django.contrib.auth.validators
 import django.db.models.deletion
@@ -5,17 +6,231 @@ import django.utils.timezone
 from django.conf import settings
 from django.db import migrations, models
 
-
 class Migration(migrations.Migration):
 
     initial = True
 
     dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('auth', '0012_alter_user_first_name_max_length'),
     ]
 
     operations = [
         migrations.CreateModel(
+
+            name="Actuacion",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("fecha", models.DateField()),
+                ("descripcion", models.TextField()),
+                ("total", models.DecimalField(decimal_places=2, max_digits=10)),
+            ],
+        ),
+        migrations.CreateModel(
+            name="Cliente",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("nombre", models.CharField(max_length=100)),
+                ("cif", models.CharField(blank=True, max_length=20, null=True)),
+                ("direccion", models.CharField(blank=True, max_length=200, null=True)),
+                ("email", models.EmailField(blank=True, max_length=254, null=True)),
+                ("telefono", models.CharField(blank=True, max_length=20, null=True)),
+                ("activo", models.BooleanField(default=True)),
+                (
+                    "usuario",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+        ),
+        migrations.CreateModel(
+            name="Presupuesto",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("fecha", models.DateField()),
+                ("concepto", models.CharField(max_length=255)),
+                ("total", models.DecimalField(decimal_places=2, max_digits=10)),
+                (
+                    "cliente",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.cliente"
+                    ),
+                ),
+                (
+                    "usuario",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+        ),
+        migrations.CreateModel(
+            name="Pedido",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("fecha", models.DateField()),
+                ("descripcion", models.CharField(max_length=255)),
+                ("total", models.DecimalField(decimal_places=2, max_digits=10)),
+                (
+                    "cliente",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.cliente"
+                    ),
+                ),
+                (
+                    "presupuesto",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="core.presupuesto",
+                    ),
+                ),
+                (
+                    "usuario",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+        ),
+        migrations.CreateModel(
+            name="Factura",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("fecha", models.DateField()),
+                ("numero", models.CharField(max_length=20)),
+                (
+                    "base_imponible",
+                    models.DecimalField(decimal_places=2, max_digits=10),
+                ),
+                (
+                    "iva",
+                    models.DecimalField(decimal_places=2, default=21.0, max_digits=5),
+                ),
+                (
+                    "irpf",
+                    models.DecimalField(decimal_places=2, default=0.0, max_digits=5),
+                ),
+                (
+                    "total",
+                    models.DecimalField(
+                        decimal_places=2, editable=False, max_digits=10
+                    ),
+                ),
+                (
+                    "estado",
+                    models.CharField(
+                        choices=[
+                            ("borrador", "Borrador"),
+                            ("enviado", "Enviado"),
+                            ("pagado", "Pagado"),
+                        ],
+                        default="borrador",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "actuacion",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="core.actuacion",
+                    ),
+                ),
+                (
+                    "cliente",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.cliente"
+                    ),
+                ),
+                (
+                    "pedido",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="core.pedido",
+                    ),
+                ),
+                (
+                    "usuario",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+        ),
+        migrations.AddField(
+            model_name="actuacion",
+            name="cliente",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="core.cliente"
+            ),
+        ),
+        migrations.AddField(
+            model_name="actuacion",
+            name="pedido",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="core.pedido",
+            ),
+        ),
+        migrations.AddField(
+            model_name="actuacion",
+            name="usuario",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
+
             name='Usuario',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),

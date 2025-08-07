@@ -51,6 +51,7 @@ class ActuacionForm(forms.ModelForm):
             'pedido': 'Pedido',
             'fecha': 'Fecha',
             'descripcion': 'Descripción del servicio',
+            'pedido': 'Pedido asociado',
             'total': 'Total',
         }
         widgets = {
@@ -58,11 +59,12 @@ class ActuacionForm(forms.ModelForm):
             'pedido': forms.Select(attrs={'class': 'form-select'}),
             'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'pedido': forms.Select(attrs={'class': 'form-select'}),
             'total': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
-
 class FacturaForm(forms.ModelForm):
+    total = forms.DecimalField(label='Total (€)', required=False, disabled=True)
     class Meta:
         model = Factura
         fields = ['cliente', 'actuacion', 'fecha', 'numero', 'base_imponible', 'iva', 'irpf', 'total', 'estado']
@@ -79,6 +81,7 @@ class FacturaForm(forms.ModelForm):
         }
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-select'}),
+            'pedido': forms.Select(attrs={'class': 'form-select'}),
             'actuacion': forms.Select(attrs={'class': 'form-select'}),
             'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'numero': forms.TextInput(attrs={'class': 'form-control'}),
