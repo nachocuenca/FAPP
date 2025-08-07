@@ -1,10 +1,11 @@
 from django import forms
-from .models import Presupuesto
+from core.models import Presupuesto
 
 class PresupuestoForm(forms.ModelForm):
     class Meta:
         model = Presupuesto
-        fields = ['numero', 'cliente', 'concepto', 'total', 'estado']
+        fields = ['cliente', 'fecha', 'concepto', 'total']
         widgets = {
             'concepto': forms.Textarea(attrs={'rows': 3}),
+            'fecha': forms.DateInput(attrs={'type': 'date'}),
         }

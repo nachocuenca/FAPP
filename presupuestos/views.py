@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.template.loader import get_template
 from xhtml2pdf import pisa
-from .models import Presupuesto
+from core.models import Presupuesto
 from .forms import PresupuestoForm
 
 @login_required
@@ -16,7 +16,9 @@ def presupuesto_list(request):
 def presupuesto_create(request):
     form = PresupuestoForm(request.POST or None)
     if form.is_valid():
-        form.save()
+        presupuesto = form.save(commit=False)
+        presupuesto.usuario = request.user
+        presupuesto.save()
         return redirect('presupuesto_list')
     return render(request, 'presupuestos/presupuesto_form.html', {'form': form, 'modo': 'Nuevo'})
 
@@ -25,7 +27,9 @@ def presupuesto_update(request, pk):
     presupuesto = get_object_or_404(Presupuesto, pk=pk)
     form = PresupuestoForm(request.POST or None, instance=presupuesto)
     if form.is_valid():
-        form.save()
+        presupuesto = form.save(commit=False)
+        presupuesto.usuario = request.user
+        presupuesto.save()
         return redirect('presupuesto_list')
     return render(request, 'presupuestos/presupuesto_form.html', {'form': form, 'modo': 'Editar'})
 
@@ -42,9 +46,9 @@ def presupuesto_export_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="presupuestos.csv"'
     writer = csv.writer(response)
-    writer.writerow(['Fecha', 'Número', 'Cliente', 'Total', 'Estado'])
+    writer.writerow(['Fecha', 'Cliente', 'Total'])
     for p in Presupuesto.objects.all():
-        writer.writerow([p.fecha, p.numero, p.cliente.nombre, p.total, p.estado])
+        writer.writerow([p.fecha, p.cliente.nombre, p.total])
     return response
 
 @login_required

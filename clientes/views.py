@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from reportlab.pdfgen import canvas
 
 from .forms import ClienteForm
-from .models import Cliente
+from core.models import Cliente
 
 
 def cliente_list(request):
@@ -17,7 +17,9 @@ def cliente_create(request):
     if request.method == 'POST':
         form = ClienteForm(request.POST)
         if form.is_valid():
-            form.save()
+            cliente = form.save(commit=False)
+            cliente.usuario = request.user
+            cliente.save()
             return redirect('clientes:cliente_list')
     else:
         form = ClienteForm()
@@ -29,7 +31,9 @@ def cliente_edit(request, pk):
     if request.method == 'POST':
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
-            form.save()
+            cliente = form.save(commit=False)
+            cliente.usuario = request.user
+            cliente.save()
             return redirect('clientes:cliente_list')
     else:
         form = ClienteForm(instance=cliente)

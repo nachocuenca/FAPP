@@ -22,9 +22,6 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'core',
     'presupuestos',
-    'pedidos',
-    'actuaciones',
-    'facturas',
     'plantillas',
     'configuracion',
 ]
