@@ -24,14 +24,14 @@ def clientes_list(request):
 @login_required
 def cliente_nuevo(request):
     if request.method == "POST":
-        form = ClienteForm(request.POST)
+        form = ClienteForm(request.POST, request=request)
         if form.is_valid():
             cliente = form.save(commit=False)
             cliente.usuario = request.user
             cliente.save()
             return redirect("clientes_list")
     else:
-        form = ClienteForm()
+        form = ClienteForm(request=request)
     return render(
         request,
         "core/clientes/cliente_form.html",
@@ -43,12 +43,12 @@ def cliente_editar(request, pk):
 
     cliente = get_object_or_404(Cliente, pk=pk, usuario=request.user)
     if request.method == 'POST':
-        form = ClienteForm(request.POST, instance=cliente)
+        form = ClienteForm(request.POST, instance=cliente, request=request)
         if form.is_valid():
             form.save()
             return redirect("clientes_list")
     else:
-        form = ClienteForm(instance=cliente)
+        form = ClienteForm(instance=cliente, request=request)
     return render(
         request,
         "core/clientes/cliente_form.html",
@@ -93,26 +93,26 @@ def pedidos_list(request):
 @login_required
 def pedido_nuevo(request):
     if request.method == 'POST':
-        form = PedidoForm(request.POST)
+        form = PedidoForm(request.POST, request=request)
         if form.is_valid():
             pedido = form.save(commit=False)
             pedido.usuario = request.user
             pedido.save()
             return redirect('pedidos_list')
     else:
-        form = PedidoForm()
+        form = PedidoForm(request=request)
     return render(request, 'core/pedidos/pedido_form.html', {'form': form, 'modo': 'nuevo'})
 
 @login_required
 def pedido_editar(request, pk):
     pedido = get_object_or_404(Pedido, pk=pk, usuario=request.user)
     if request.method == 'POST':
-        form = PedidoForm(request.POST, instance=pedido)
+        form = PedidoForm(request.POST, instance=pedido, request=request)
         if form.is_valid():
             form.save()
             return redirect('pedidos_list')
     else:
-        form = PedidoForm(instance=pedido)
+        form = PedidoForm(instance=pedido, request=request)
     return render(request, 'core/pedidos/pedido_form.html', {'form': form, 'modo': 'editar'})
 
 @login_required
@@ -148,26 +148,26 @@ def actuaciones_list(request):
 @login_required
 def actuacion_nueva(request):
     if request.method == 'POST':
-        form = ActuacionForm(request.POST)
+        form = ActuacionForm(request.POST, request=request)
         if form.is_valid():
             actuacion = form.save(commit=False)
             actuacion.usuario = request.user
             actuacion.save()
             return redirect('actuaciones_list')
     else:
-        form = ActuacionForm()
+        form = ActuacionForm(request=request)
     return render(request, 'core/actuaciones/actuacion_form.html', {'form': form})
 
 @login_required
 def actuacion_editar(request, pk):
     actuacion = get_object_or_404(Actuacion, pk=pk, usuario=request.user)
     if request.method == 'POST':
-        form = ActuacionForm(request.POST, instance=actuacion)
+        form = ActuacionForm(request.POST, instance=actuacion, request=request)
         if form.is_valid():
             form.save()
             return redirect('actuaciones_list')
     else:
-        form = ActuacionForm(instance=actuacion)
+        form = ActuacionForm(instance=actuacion, request=request)
     return render(request, 'core/actuaciones/actuacion_form.html', {'form': form})
 
 @login_required
@@ -200,14 +200,14 @@ def facturas_list(request):
 @login_required
 def factura_nueva(request):
     if request.method == "POST":
-        form = FacturaForm(request.POST)
+        form = FacturaForm(request.POST, request=request)
         if form.is_valid():
             factura = form.save(commit=False)
             factura.usuario = request.user
             factura.save()
             return redirect("facturas_list")
     else:
-        form = FacturaForm()
+        form = FacturaForm(request=request)
     return render(request, "core/facturas/factura_form.html", {"form": form})
 
 
@@ -215,12 +215,12 @@ def factura_nueva(request):
 def factura_editar(request, pk):
     factura = get_object_or_404(Factura, pk=pk, usuario=request.user)
     if request.method == "POST":
-        form = FacturaForm(request.POST, instance=factura)
+        form = FacturaForm(request.POST, instance=factura, request=request)
         if form.is_valid():
             form.save()
             return redirect("facturas_list")
     else:
-        form = FacturaForm(instance=factura)
+        form = FacturaForm(instance=factura, request=request)
     return render(request, "core/facturas/factura_form.html", {"form": form})
 
 
