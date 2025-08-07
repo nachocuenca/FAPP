@@ -22,7 +22,7 @@ def dashboard(request):
 @login_required
 def clientes_list(request):
     clientes = Cliente.objects.all()
-    return render(request, 'core/clientes/clientes_list.html', {'clientes': clientes})
+    return render(request, 'core/clientes_list.html', {'clientes': clientes})
 
 @login_required
 def cliente_nuevo(request):

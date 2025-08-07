@@ -39,7 +39,7 @@
                 <th>CIF</th>
                 <th>Email</th>
                 <th>Teléfono</th>
-                <th>Localidad</th>
+                <th>Dirección</th>
                 <th class="text-center">Activo</th>
                 <th class="text-center">Acciones</th>
               </tr>
@@ -51,7 +51,7 @@
                 <td>{{ cliente.cif }}</td>
                 <td>{{ cliente.email }}</td>
                 <td>{{ cliente.telefono }}</td>
-                <td>{{ cliente.localidad }}</td>
+                <td>{{ cliente.direccion }}</td>
                 <td class="text-center">
                   {% if cliente.activo %}
                     <span class="text-success">●</span>
@@ -61,9 +61,6 @@
                 </td>
                 <td class="text-center text-nowrap">
                   <a href="{% url 'cliente_editar' cliente.id %}" class="btn btn-sm btn-warning">Editar</a>
-                  <a href="{% url 'cliente_toggle' cliente.id %}" class="btn btn-sm btn-outline-dark">
-                    {% if cliente.activo %}Desactivar{% else %}Activar{% endif %}
-                  </a>
                 </td>
               </tr>
               {% empty %}
