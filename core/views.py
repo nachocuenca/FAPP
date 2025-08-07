@@ -34,7 +34,7 @@ def cliente_nuevo(request):
         form = ClienteForm()
     return render(
         request,
-        "core/cliente_form.html",
+        "core/clientes/cliente_form.html",
         {"form": form, "modo": "nuevo"},
     )
 
@@ -51,7 +51,7 @@ def cliente_editar(request, pk):
         form = ClienteForm(instance=cliente)
     return render(
         request,
-        "core/cliente_form.html",
+        "core/clientes/cliente_form.html",
         {"form": form, "modo": "editar"},
     )
 
@@ -74,7 +74,7 @@ def cliente_export_pdf(request):
     clientes = Cliente.objects.filter(usuario=request.user)
     context = {'clientes': clientes}
     try:
-        return export_pdf('core/clientes_pdf.html', context, 'clientes.pdf')
+        return export_pdf('core/clientes/clientes_pdf.html', context, 'clientes.pdf')
     except Exception as e:
         return HttpResponse(f"Error al generar PDF: {e}", status=500)
 
@@ -83,7 +83,7 @@ def cliente_export_pdf(request):
 def cliente_print_html(request):
     clientes = Cliente.objects.filter(usuario=request.user)
     context = {'clientes': clientes}
-    return render_html('core/clientes_pdf.html', context)
+    return render_html('core/clientes/clientes_pdf.html', context)
 
 @login_required
 def pedidos_list(request):
@@ -117,24 +117,26 @@ def pedido_editar(request, pk):
 
 @login_required
 def pedido_export_csv(request):
-
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="pedidos.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['Fecha', 'Cliente', 'Presupuesto', 'Total'])
-    for p in Pedido.objects.filter(usuario=request.user):
-        writer.writerow([p.fecha, p.cliente.nombre, p.presupuesto.id if p.presupuesto else '', p.total])
-    return response
+    queryset = Pedido.objects.filter(usuario=request.user)
+    fields = [
+        ("fecha", "Fecha"),
+        ("cliente", "Cliente"),
+        ("presupuesto", "Presupuesto"),
+        ("total", "Total"),
+    ]
+    try:
+        return export_csv(queryset, fields, "pedidos.csv")
+    except Exception as e:
+        return HttpResponse(f"Error al generar CSV: {e}", status=500)
 
 @login_required
 def pedido_export_pdf(request):
     pedidos = Pedido.objects.filter(usuario=request.user)
-    template = get_template('core/pedidos/pedidos_pdf.html')
-    html = template.render({'pedidos': pedidos})
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="pedidos.pdf"'
-    pisa.CreatePDF(html, dest=response)
-    return response
+    context = {"pedidos": pedidos}
+    try:
+        return export_pdf("core/pedidos/pedidos_pdf.html", context, "pedidos.pdf")
+    except Exception as e:
+        return HttpResponse(f"Error al generar PDF: {e}", status=500)
 
 
 # --- Actuaciones ---
@@ -224,13 +226,16 @@ def factura_editar(request, pk):
 
 @login_required
 def factura_export_csv(request):
-    response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = 'attachment; filename="facturas.csv"'
-    writer = csv.writer(response)
-    writer.writerow(["Número", "Cliente", "Total"])
-    for factura in Factura.objects.filter(usuario=request.user):
-        writer.writerow([factura.numero, factura.cliente.nombre, factura.total])
-    return response
+    queryset = Factura.objects.filter(usuario=request.user)
+    fields = [
+        ("numero", "Número"),
+        ("cliente", "Cliente"),
+        ("total", "Total"),
+    ]
+    try:
+        return export_csv(queryset, fields, "facturas.csv")
+    except Exception as e:
+        return HttpResponse(f"Error al generar CSV: {e}", status=500)
 
 
 

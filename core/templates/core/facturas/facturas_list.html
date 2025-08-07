@@ -1,42 +1,11 @@
-{% extends 'core/base_lte.html' %}
-{% block title %}Facturas{% endblock %}
-
+{% extends "core/base.html" %}
 {% block content %}
-<div class="container-fluid">
-  <div class="d-flex justify-content-between mb-3">
-    <h1>Facturas</h1>
-    <div>
-      <a class="btn btn-primary" href="{% url 'factura_nueva' %}"><i class="fas fa-plus"></i> Nueva</a>
-      <a class="btn btn-secondary" href="{% url 'factura_export_csv' %}">CSV</a>
-      <a class="btn btn-secondary" href="{% url 'factura_export_html' %}">HTML</a>
-      <a class="btn btn-secondary" href="{% url 'factura_export_pdf' %}">PDF</a>
-    </div>
-  </div>
-
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Número</th>
-        <th>Cliente</th>
-        <th>Total</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for factura in facturas %}
-      <tr>
-        <td>{{ factura.numero }}</td>
-        <td>{{ factura.cliente.nombre }}</td>
-        <td>{{ factura.total }}</td>
-        <td>
-          <a class="btn btn-sm btn-primary" href="{% url 'factura_editar' factura.pk %}"><i class="fas fa-edit"></i></a>
-        </td>
-      </tr>
-    {% empty %}
-      <tr><td colspan="4">No hay facturas.</td></tr>
-    {% endfor %}
-    </tbody>
-  </table>
-</div>
+<h1>Facturas</h1>
+<ul>
+  {% for f in facturas %}
+  <li>{{ f.numero }} - {{ f.total }}</li>
+  {% empty %}
+  <li>No hay facturas</li>
+  {% endfor %}
+</ul>
 {% endblock %}
-

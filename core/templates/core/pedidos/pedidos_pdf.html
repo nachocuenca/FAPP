@@ -1,35 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <style>
-    body { font-family: Arial, sans-serif; font-size: 12px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    th, td { border: 1px solid #ccc; padding: 4px; }
-    th { background: #f0f0f0; }
-  </style>
-</head>
-<body>
-  <h2>Listado de pedidos</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Fecha</th>
-        <th>Cliente</th>
-        <th>Presupuesto</th>
-        <th>Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for p in pedidos %}
-      <tr>
-        <td>{{ p.fecha }}</td>
-        <td>{{ p.cliente.nombre }}</td>
-        <td>{% if p.presupuesto %}{{ p.presupuesto.id }}{% endif %}</td>
-        <td>{{ p.total }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</body>
-</html>
+<html><body>
+<h1>Pedidos</h1>
+<table>
+  <tr><th>Descripción</th><th>Total</th></tr>
+  {% for p in pedidos %}
+  <tr><td>{{ p.descripcion }}</td><td>{{ p.total }}</td></tr>
+  {% endfor %}
+</table>
+</body></html>

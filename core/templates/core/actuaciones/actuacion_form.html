@@ -1,11 +1,9 @@
-{% extends 'core/base.html' %}
-{% block title %}Actuación{% endblock %}
+{% extends "core/base.html" %}
 {% block content %}
-<h1>{% if form.instance.pk %}Editar{% else %}Nueva{% endif %} actuación</h1>
+<h1>Actuación</h1>
 <form method="post">
   {% csrf_token %}
   {{ form.as_p }}
   <button type="submit" class="btn btn-primary">Guardar</button>
-  <a href="{% url 'actuaciones_list' %}" class="btn btn-secondary">Cancelar</a>
 </form>
 {% endblock %}

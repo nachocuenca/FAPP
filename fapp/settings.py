@@ -60,16 +60,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'fapp.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'fappdb'),
-        'USER': os.getenv('POSTGRES_USER', 'fappuser'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'fapppass'),
-        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
-        'PORT': os.getenv('POSTGRES_PORT', '5432'),
+if os.environ.get("USE_SQLITE") == "1":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('POSTGRES_DB', 'fappdb'),
+            'USER': os.getenv('POSTGRES_USER', 'fappuser'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'fapppass'),
+            'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+            'PORT': os.getenv('POSTGRES_PORT', '5432'),
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
