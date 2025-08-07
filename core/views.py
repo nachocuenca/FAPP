@@ -2,9 +2,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Cliente, Presupuesto, Pedido, Actuacion, Factura
-from .forms import ClienteForm, PresupuestoForm
+from .forms import ClienteForm, PresupuestoForm, FacturaForm
 from django.http import HttpResponse
+from django.template.loader import render_to_string
 import csv
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 
 @login_required
 def dashboard(request):
@@ -115,20 +118,78 @@ def actuacion_editar(request, pk):
 # --- Facturas ---
 @login_required
 def facturas_list(request):
-    return render(request, 'core/facturas/facturas_list.html')
+    facturas = Factura.objects.all()
+    return render(
+        request, "core/facturas/facturas_list.html", {"facturas": facturas}
+    )
+
 
 @login_required
 def factura_nueva(request):
-    return render(request, 'core/facturas/factura_form.html')
+    if request.method == "POST":
+        form = FacturaForm(request.POST)
+        if form.is_valid():
+            factura = form.save(commit=False)
+            factura.usuario = request.user
+            factura.save()
+            return redirect("facturas_list")
+    else:
+        form = FacturaForm()
+    return render(request, "core/facturas/factura_form.html", {"form": form})
+
 
 @login_required
 def factura_editar(request, pk):
-    return render(request, 'core/facturas/factura_form.html')
+    factura = get_object_or_404(Factura, pk=pk)
+    if request.method == "POST":
+        form = FacturaForm(request.POST, instance=factura)
+        if form.is_valid():
+            form.save()
+            return redirect("facturas_list")
+    else:
+        form = FacturaForm(instance=factura)
+    return render(request, "core/facturas/factura_form.html", {"form": form})
+
 
 @login_required
 def factura_export_csv(request):
-    return HttpResponse("Exportar CSV (facturas)")
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="facturas.csv"'
+    writer = csv.writer(response)
+    writer.writerow(["Número", "Cliente", "Total"])
+    for factura in Factura.objects.all():
+        writer.writerow([factura.numero, factura.cliente.nombre, factura.total])
+    return response
+
+
+@login_required
+def factura_export_html(request):
+    facturas = Factura.objects.all()
+    html = render_to_string(
+        "core/facturas/facturas_export.html", {"facturas": facturas}
+    )
+    response = HttpResponse(html, content_type="text/html")
+    response["Content-Disposition"] = 'attachment; filename="facturas.html"'
+    return response
+
 
 @login_required
 def factura_export_pdf(request):
-    return HttpResponse("Exportar PDF (facturas)")
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename="facturas.pdf"'
+    p = canvas.Canvas(response, pagesize=letter)
+    y = 770
+    p.drawString(80, 800, "Listado de facturas")
+    for factura in Factura.objects.all():
+        p.drawString(
+            80,
+            y,
+            f"{factura.numero} - {factura.cliente.nombre} - {factura.total}",
+        )
+        y -= 20
+        if y < 50:
+            p.showPage()
+            y = 770
+    p.showPage()
+    p.save()
+    return response

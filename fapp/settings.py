@@ -52,12 +52,8 @@ WSGI_APPLICATION = 'fapp.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'fappdb',
-        'USER': 'fappuser',
-        'PASSWORD': 'fapppass',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 

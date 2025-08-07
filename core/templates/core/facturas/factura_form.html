@@ -1,1 +1,25 @@
-<h1>Formulario de factura</h1>
+{% extends 'core/base_lte.html' %}
+{% block title %}Factura{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1>{% if form.instance.pk %}Editar{% else %}Nueva{% endif %} factura</h1>
+  <form method="post">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-6">{{ form.cliente.label_tag }} {{ form.cliente }}</div>
+      <div class="col-md-6">{{ form.fecha.label_tag }} {{ form.fecha }}</div>
+      <div class="col-md-6">{{ form.pedido.label_tag }} {{ form.pedido }}</div>
+      <div class="col-md-6">{{ form.actuacion.label_tag }} {{ form.actuacion }}</div>
+      <div class="col-md-6">{{ form.numero.label_tag }} {{ form.numero }}</div>
+      <div class="col-md-6">{{ form.base_imponible.label_tag }} {{ form.base_imponible }}</div>
+      <div class="col-md-6">{{ form.iva.label_tag }} {{ form.iva }}</div>
+      <div class="col-md-6">{{ form.irpf.label_tag }} {{ form.irpf }}</div>
+      <div class="col-md-6">{{ form.total.label_tag }} {{ form.total }}</div>
+    </div>
+    <button class="btn btn-primary mt-3" type="submit">Guardar</button>
+    <a class="btn btn-secondary mt-3" href="{% url 'facturas_list' %}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}
+
